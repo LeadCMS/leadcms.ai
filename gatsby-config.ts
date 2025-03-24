@@ -65,7 +65,6 @@ const config: GatsbyConfig = {
             options: {
                 apiUrl: process.env.ONLINESALES_API_URL,
                 language: process.env.ONLINESALES_LANGUAGE || "en",
-                staticFolder: `${__dirname}/static`,
             },
         },
     ],

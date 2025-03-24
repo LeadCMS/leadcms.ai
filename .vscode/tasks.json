@@ -1,0 +1,19 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "gatsby-clean",
+      "type": "shell",
+      "command": "${env:HOME}/.nvm/versions/node/v18.20.7/bin/node",
+      "args": [
+        "${workspaceRoot}/node_modules/.bin/gatsby",
+        "clean"
+      ],
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      },
+      "problemMatcher": []
+    }
+  ]
+}
