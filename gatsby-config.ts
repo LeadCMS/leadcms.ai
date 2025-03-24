@@ -1,58 +1,74 @@
+import dotenv from "dotenv";
 import type { GatsbyConfig } from "gatsby";
 
+// Load environment variables from .env file
+dotenv.config();
+
+// Validate required environment variables
+if (!process.env.ONLINESALES_API_URL) {
+    throw new Error(
+        "The ONLINESALES_API_URL environment variable is required. Please check your .env file."
+    );
+}
+
 const config: GatsbyConfig = {
-  siteMetadata: {
-    title: `OnlineSales`,
-    siteUrl: `https://www.yourdomain.tld`
-  },
-  // More easily incorporate content into your pages through automatic TypeScript type generation and better GraphQL IntelliSense.
-  // If you use VSCode you can also use the GraphQL plugin
-  // Learn more at: https://gatsby.dev/graphql-typegen
-  graphqlTypegen: true,
-  plugins: [
-    "gatsby-plugin-postcss", 
-    {
-      resolve: "gatsby-plugin-google-gtag",
-      options: {
-        // You need to provide at least one tracking ID
-        trackingIds: [
-          "GA-TRACKING-ID", // Replace with your actual Google Analytics tracking ID
-        ],
-        // Optional configuration options
-        pluginConfig: {
-          // Puts tracking script in the head instead of the body
-          head: true,
+    siteMetadata: {
+        title: `OnlineSales`,
+        siteUrl: `https://onlinesales.tech`,
+    },
+    graphqlTypegen: true,
+    plugins: [
+        "gatsby-plugin-postcss",
+        {
+            resolve: "gatsby-plugin-google-gtag",
+            options: {
+                // You need to provide at least one tracking ID
+                trackingIds: [
+                    process.env.GA_TRACKING_ID, // Replace with your actual Google Analytics tracking ID
+                ],
+                // Optional configuration options
+                pluginConfig: {
+                    // Puts tracking script in the head instead of the body
+                    head: true,
+                },
+            },
         },
-      },
-    }, 
-    "gatsby-plugin-image", 
-    "gatsby-plugin-sitemap", 
-    {
-      resolve: 'gatsby-plugin-manifest',
-      options: {
-        "icon": "src/images/icon.png"
-      }
-    }, 
-    "gatsby-plugin-mdx", 
-    "gatsby-plugin-sharp", 
-    "gatsby-transformer-sharp", 
-    {
-      resolve: 'gatsby-source-filesystem',
-      options: {
-        "name": "images",
-        "path": "./src/images/"
-      },
-      __key: "images"
-    }, 
-    {
-      resolve: 'gatsby-source-filesystem',
-      options: {
-        "name": "pages",
-        "path": "./src/pages/"
-      },
-      __key: "pages"
-    }
-  ]
+        "gatsby-plugin-image",
+        "gatsby-plugin-sitemap",
+        {
+            resolve: "gatsby-plugin-manifest",
+            options: {
+                icon: "src/images/icon.png",
+            },
+        },
+        "gatsby-plugin-mdx",
+        "gatsby-plugin-sharp",
+        "gatsby-transformer-sharp",
+        {
+            resolve: "gatsby-source-filesystem",
+            options: {
+                name: "images",
+                path: "./src/images/",
+            },
+            __key: "images",
+        },
+        {
+            resolve: "gatsby-source-filesystem",
+            options: {
+                name: "pages",
+                path: "./src/pages/",
+            },
+            __key: "pages",
+        },
+        {
+            resolve: "gatsby-source-onlinesales",
+            options: {
+                apiUrl: process.env.ONLINESALES_API_URL,
+                language: process.env.ONLINESALES_LANGUAGE || "en",
+                staticFolder: `${__dirname}/static`,
+            },
+        },
+    ],
 };
 
 export default config;

@@ -1,44 +1,56 @@
 {
-  "name": "online-sales",
-  "version": "1.0.0",
-  "private": true,
-  "description": "online-sales",
-  "author": "Peter Liapin",
-  "keywords": [
-    "gatsby"
-  ],
-  "license": "MIT",
-  "scripts": {
-    "develop": "gatsby develop",
-    "start": "gatsby develop",
-    "build": "gatsby build",
-    "serve": "gatsby serve",
-    "clean": "gatsby clean",
-    "typecheck": "tsc --noEmit"
-  },
-  "dependencies": {
-    "@mdx-js/react": "^3.1.0",
-    "@tailwindcss/postcss": "^4.0.15",
-    "autoprefixer": "^10.4.21",
-    "gatsby": "^5.14.1",
-    "gatsby-plugin-google-gtag": "^5.14.0",
-    "gatsby-plugin-image": "^3.14.0",
-    "gatsby-plugin-manifest": "^5.14.0",
-    "gatsby-plugin-mdx": "^5.14.0",
-    "gatsby-plugin-postcss": "^6.14.0",
-    "gatsby-plugin-sharp": "^5.14.0",
-    "gatsby-plugin-sitemap": "^6.14.0",
-    "gatsby-source-filesystem": "^5.14.0",
-    "gatsby-transformer-sharp": "^5.14.0",
-    "postcss": "^8.5.3",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
-    "tailwindcss": "^4.0.15"
-  },
-  "devDependencies": {
-    "@types/node": "^20.11.19",
-    "@types/react": "^18.2.55",
-    "@types/react-dom": "^18.2.19",
-    "typescript": "^5.3.3"
-  }
+    "name": "onlinesales.tech",
+    "version": "1.0.0",
+    "private": true,
+    "description": "Lightweight, extendable headless CMS for product websites written in .NET 7",
+    "author": "Peter Liapin",
+    "keywords": [
+        "gatsby"
+    ],
+    "license": "MIT",
+    "scripts": {
+        "develop": "gatsby develop",
+        "start": "gatsby develop",
+        "build": "gatsby build",
+        "serve": "gatsby serve",
+        "clean": "gatsby clean",
+        "typecheck": "tsc --noEmit",
+        "lint": "eslint \"src/**/*.{ts,tsx}\" --fix",
+        "lint:fix": "eslint . --ext .ts,.tsx --fix",
+        "lint:all": "eslint \"{src,plugins}/**/*.{ts,tsx}\" --fix"
+    },
+    "dependencies": {
+        "@mdx-js/react": "^3.1.0",
+        "@tailwindcss/postcss": "^4.0.15",
+        "autoprefixer": "^10.4.21",
+        "gatsby": "^5.14.1",
+        "gatsby-plugin-google-gtag": "^5.14.0",
+        "gatsby-plugin-image": "^3.14.0",
+        "gatsby-plugin-manifest": "^5.14.0",
+        "gatsby-plugin-mdx": "^5.14.0",
+        "gatsby-plugin-postcss": "^6.14.0",
+        "gatsby-plugin-sharp": "^5.14.0",
+        "gatsby-plugin-sitemap": "^6.14.0",
+        "gatsby-source-filesystem": "^5.14.0",
+        "gatsby-transformer-sharp": "^5.14.0",
+        "postcss": "^8.5.3",
+        "react": "^18.2.0",
+        "react-dom": "^18.2.0",
+        "tailwindcss": "^4.0.15"
+    },
+    "devDependencies": {
+        "@types/node": "^20.11.19",
+        "@types/react": "^18.2.55",
+        "@types/react-dom": "^18.2.19",
+        "@typescript-eslint/eslint-plugin": "^6.21.0",
+        "@typescript-eslint/parser": "^6.21.0",
+        "eslint": "^8.56.0",
+        "eslint-config-prettier": "^9.1.0",
+        "eslint-plugin-import": "^2.29.1",
+        "eslint-plugin-jsx-a11y": "^6.8.0",
+        "eslint-plugin-react": "^7.33.2",
+        "eslint-plugin-react-hooks": "^4.6.0",
+        "prettier": "^3.2.5",
+        "typescript": "5.3.3"
+    }
 }
