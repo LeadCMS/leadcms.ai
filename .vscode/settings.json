@@ -27,5 +27,9 @@
     "eslint.format.enable": true,
     "eslint.debug": false,
     "editor.showUnused": true,
-    "problems.showCurrentInStatus": true
+    "problems.showCurrentInStatus": true,
+
+    "css.validate": false,
+    "less.validate": false,
+    "scss.validate": false
 }
