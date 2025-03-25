@@ -18,7 +18,14 @@ const config: GatsbyConfig = {
     },
     graphqlTypegen: true,
     plugins: [
-        "gatsby-plugin-postcss",
+        {
+            resolve: "gatsby-plugin-postcss",
+            options: {
+                postcssOptions: {
+                    plugins: [require("@tailwindcss/postcss")],
+                },
+            },
+        },
         {
             resolve: "gatsby-plugin-google-gtag",
             options: {
