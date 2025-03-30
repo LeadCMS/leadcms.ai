@@ -1,4 +1,6 @@
-module.exports = {
+import { Linter } from 'eslint';
+
+const config: Linter.Config = {
     parser: "@typescript-eslint/parser",
     extends: [
         "eslint:recommended",
@@ -23,15 +25,16 @@ module.exports = {
         "import/resolver": {
             node: {
                 extensions: [".js", ".jsx", ".ts", ".tsx"],
+                paths: ["src"],
             },
+            typescript: {},
         },
     },
     parserOptions: {
         ecmaVersion: 2020,
         sourceType: "module",
-        project: "./tsconfig.json",
+        project: "./tsconfig.eslint.json",
         tsconfigRootDir: __dirname,
-        createDefaultProgram: true,
     },
     rules: {
         "react/prop-types": "off",
@@ -42,7 +45,7 @@ module.exports = {
             "error",
             {
                 components: ["Link"],
-                specialLink: ["to"],
+                specialLink: ["to"], // This already matches Gatsby's Link which uses 'to' prop
             },
         ],
         "import/order": [
@@ -72,3 +75,5 @@ module.exports = {
         },
     ],
 };
+
+export default config;
