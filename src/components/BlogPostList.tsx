@@ -15,7 +15,7 @@ interface BlogPost {
 }
 
 interface BlogPostQueryData {
-    allOnlineSalesPost: {
+    allOnlineSalesBlog: {
         nodes: BlogPost[];
     };
 }
@@ -45,7 +45,7 @@ const BlogPostList: React.FC<BlogPostListProps> = ({
 
     const data = useStaticQuery<BlogPostQueryData>(graphql`
         query {
-            allOnlineSalesPost(sort: { publishedAt: DESC }, filter: { publishedAt: { ne: null } }) {
+            allOnlineSalesBlog(sort: { publishedAt: DESC }, filter: { publishedAt: { ne: null } }) {
                 nodes {
                     id
                     slug
@@ -62,7 +62,7 @@ const BlogPostList: React.FC<BlogPostListProps> = ({
         }
     `);
 
-    const posts = data.allOnlineSalesPost.nodes;
+    const posts = data.allOnlineSalesBlog.nodes;
     const totalPages = Math.ceil(posts.length / postsPerPage);
     const startIndex = (currentPage - 1) * postsPerPage;
     const endIndex = startIndex + postsPerPage;

@@ -36,8 +36,8 @@ interface LandingPageData {
         title: string;
         description: string;
         body: string;
-        seoKeywords?: string;
-        seoImage?: string;
+        seoKeywords?: string; // Make optional with ?
+        seoImage?: string; // Make optional with ?
     };
 }
 
@@ -150,8 +150,6 @@ export const query = graphql`
             title
             description
             body
-            seoKeywords
-            seoImage
         }
     }
 `;

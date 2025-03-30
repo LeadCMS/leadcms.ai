@@ -53,7 +53,7 @@ export default PageTemplate;
 
 export const query = graphql`
     query ($id: String!) {
-        onlineSalesPage(id: { eq: $id }) {
+        onlineSalesPricing(id: { eq: $id }) {
             slug
             title
             description
@@ -62,7 +62,6 @@ export const query = graphql`
             coverImageAlt
             author
             publishedAt
-            updatedAt
         }
     }
 `;

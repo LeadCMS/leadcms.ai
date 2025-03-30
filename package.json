@@ -10,7 +10,7 @@
     "license": "MIT",
     "scripts": {
         "develop": "gatsby develop",
-        "start": "gatsby develop",
+        "start": "GATSBY_EXPERIMENTAL_REFRESH_ENDPOINT=true gatsby develop",
         "build": "gatsby build",
         "serve": "gatsby serve",
         "clean": "gatsby clean",
