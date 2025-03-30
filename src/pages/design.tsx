@@ -689,9 +689,9 @@ export default function LandingPage() {
                   <GitBranch className="mr-2 h-4 w-4" />
                   View on GitHub
                 </Link>
-              </Button>
-              <Button asChild size="lg" variant="outline">
-                <Link href="#contact-form">Contact Us</Link>
+              </Button>              
+              <Button asChild size="lg" variant="secondary">
+                <Link href="#contact-form">Contact Us</Link>                
               </Button>
             </div>
           </div>
