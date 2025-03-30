@@ -174,12 +174,8 @@ export const sourceNodes: GatsbyNode["sourceNodes"] = async (
             }
 
             // Create node based on content type
-            const nodeType =
-                item.type === "page"
-                    ? "OnlineSalesPage"
-                    : item.type === "blog"
-                      ? "OnlineSalesBlog"
-                      : "OnlineSalesPost";
+            // Convert any content type to a valid node type (capitalize + prepend "OnlineSales")
+            const nodeType = `OnlineSales${item.type.charAt(0).toUpperCase() + item.type.slice(1)}`;
 
             const nodeId = createNodeId(`onlinesales-${item.type}-${item.id}`);
             const nodeContent = JSON.stringify(item);
