@@ -22,7 +22,7 @@ const config: GatsbyConfig = {
             resolve: "gatsby-plugin-postcss",
             options: {
                 postcssOptions: {
-                    plugins: [require("@tailwindcss/postcss")],
+                    plugins: [require("tailwindcss"), require("autoprefixer")],
                 },
             },
         },

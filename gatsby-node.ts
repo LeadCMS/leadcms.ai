@@ -3,6 +3,7 @@
  * See: https://www.gatsbyjs.com/docs/node-apis/
  */
 
+import path from "path";
 import { GatsbyNode } from "gatsby";
 
 export const createSchemaCustomization: GatsbyNode["createSchemaCustomization"] = ({ actions }) => {
@@ -21,4 +22,14 @@ export const createSchemaCustomization: GatsbyNode["createSchemaCustomization"] 
   `;
 
     createTypes(typeDefs);
+};
+
+export const onCreateWebpackConfig: GatsbyNode["onCreateWebpackConfig"] = ({ actions }) => {
+    actions.setWebpackConfig({
+        resolve: {
+            alias: {
+                "@": path.resolve(__dirname, "src"),
+            },
+        },
+    });
 };
