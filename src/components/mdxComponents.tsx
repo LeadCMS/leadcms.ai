@@ -16,19 +16,7 @@ import {
   TabsTrigger 
 } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
-import {
-  CheckCircle,
-  Code,
-  Database,
-  GitBranch,
-  Globe,
-  Lock,
-  Package,
-  Server,
-  Settings,
-  ShieldCheck,
-  Zap,
-} from "lucide-react";
+import * as LucideIcons from "lucide-react";
 
 // UI components and icons for MDX use
 const uiComponents = {
@@ -44,21 +32,6 @@ const uiComponents = {
   TabsList,
   TabsTrigger,
   Badge,
-};
-
-// Lucide icons
-const iconComponents = {
-  CheckCircle,
-  Code,
-  Database,
-  GitBranch,
-  Globe,
-  Lock,
-  Package,
-  Server,
-  Settings,
-  ShieldCheck,
-  Zap,
 };
 
 // Use React's built-in HTML element prop types instead of custom interfaces
@@ -140,7 +113,7 @@ const baseComponents = {
 // Combined components object for MDXProvider
 
 export default {
+  ...LucideIcons,
   ...baseComponents,
   ...uiComponents,
-  ...iconComponents,
 };

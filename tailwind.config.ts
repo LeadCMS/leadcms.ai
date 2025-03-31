@@ -6,9 +6,23 @@ const config: Config = {
         "./src/pages/**/*.{ts,tsx,mdx}",
         "./src/components/**/*.{ts,tsx,mdx}",
         "./src/templates/**/*.{ts,tsx,mdx}",
+        // Ensure content from remote MDX is included
+        "./content/**/*.mdx",
+        // Consider cached remote content if stored locally
+        "./public/mdx-cache/**/*.mdx",
+        // Cache directory for gatsby-source-filesystem if used
+        "./.cache/**/*.mdx",
         "./gatsby-browser.ts",
         "./gatsby-ssr.ts",
     ],
+    extract: {
+        mdx: (content) => {
+            // This pattern captures most Tailwind class patterns including dynamic ones
+            const classesPattern = /(?:className|class)=["']([^"']*)["']/g;
+            const matches = [...content.matchAll(classesPattern)];
+            return matches.map(match => match[1]).join(' ').split(/\s+/);
+        }
+    },
     theme: {
         extend: {
             colors: {
@@ -93,5 +107,27 @@ const config: Config = {
         },
     },
     plugins: [require("tailwindcss-animate")],
+    safelist: [
+        // Basic layout and positioning
+        'container', 'mx-auto', 'flex', 'flex-col', 'flex-row', 'grid', 'grid-cols-1', 'grid-cols-2', 'grid-cols-3',
+        'gap-4', 'gap-6', 'gap-8', 'my-4', 'my-6', 'my-8', 'py-4', 'py-6', 'py-8', 'px-4', 'px-6', 'px-8',
+        
+        // Typography
+        'text-sm', 'text-base', 'text-lg', 'text-xl', 'text-2xl', 'text-3xl', 'text-4xl',
+        'font-normal', 'font-medium', 'font-semibold', 'font-bold',
+        'text-primary', 'text-secondary', 'text-muted-foreground', 'text-primary-foreground',
+        
+        // Backgrounds and borders
+        'bg-primary', 'bg-secondary', 'bg-muted', 'bg-background',
+        'border', 'border-primary', 'border-muted',
+        'rounded-md', 'rounded-lg', 'rounded-xl',
+        
+        // Effects
+        'shadow-sm', 'shadow', 'shadow-md', 'shadow-lg', 'shadow-xl',
+        
+        // Interactive elements
+        'hover:bg-primary/90', 'hover:underline', 'underline-offset-4'
+    ]
 };
+
 export default config;
