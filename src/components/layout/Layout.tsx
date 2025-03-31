@@ -32,7 +32,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
           </nav>
           <div className="flex items-center gap-4">
             <Link
-              to="https://github.com/onlinesales/onlinesales"
+              to="https://github.com/peterliapin/onlinesales.core"
               target="_blank"
               rel="noopener noreferrer"
               className="hidden md:flex items-center gap-2 text-sm font-medium"
@@ -59,17 +59,17 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
               </p>
             </div>
             <nav className="flex gap-6">
-              <Link to="#" className="text-sm font-medium text-muted-foreground hover:underline underline-offset-4">
+              <Link to="/terms" className="text-sm font-medium text-muted-foreground hover:underline underline-offset-4">
                 Terms
               </Link>
-              <Link to="#" className="text-sm font-medium text-muted-foreground hover:underline underline-offset-4">
+              <Link to="/privacy" className="text-sm font-medium text-muted-foreground hover:underline underline-offset-4">
                 Privacy
               </Link>
-              <Link to="#" className="text-sm font-medium text-muted-foreground hover:underline underline-offset-4">
+              <Link to="/getting-started" className="text-sm font-medium text-muted-foreground hover:underline underline-offset-4">
                 Docs
               </Link>
               <Link
-                to="https://github.com/onlinesales/onlinesales"
+                to="https://github.com/peterliapin/onlinesales.core"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-sm font-medium text-muted-foreground hover:underline underline-offset-4"

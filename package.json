@@ -21,8 +21,7 @@
     },
     "dependencies": {
         "@mdx-js/mdx": "^1.6.22",
-        "@mdx-js/react": "^1.6.22",
-        "@mdx-js/runtime": "^1.6.22",
+        "@mdx-js/react": "^1.6.22",        
         "@radix-ui/react-slot": "^1.0.2",
         "@radix-ui/react-tabs": "^1.0.4",
         "autoprefixer": "^10.4.14",
@@ -33,7 +32,6 @@
         "gatsby-plugin-image": "^2.25.0",
         "gatsby-plugin-manifest": "^4.25.0",
         "gatsby-plugin-mdx": "^3.20.0",
-        "gatsby-plugin-offline": "^5.25.0",
         "gatsby-plugin-postcss": "^5.25.0",
         "gatsby-plugin-sharp": "^4.25.0",
         "gatsby-plugin-sitemap": "^5.25.0",
