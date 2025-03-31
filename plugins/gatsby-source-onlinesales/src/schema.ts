@@ -18,7 +18,7 @@ export async function createOnlineSalesSchema(
         return;
     }
 
-    // Define the base interface
+    // Define the base interface including frontmatter fields
     const typeDefs = `
     interface OnlineSalesContent @dontInfer {
       id: ID!
@@ -39,6 +39,10 @@ export async function createOnlineSalesSchema(
       publishedAt: Date
       createdAt: Date
       updatedAt: Date
+      rawFrontmatter: String
+      # Common frontmatter fields
+      seoTitle: String
+      seoDescription: String
     }
   `;
 
@@ -83,6 +87,10 @@ export async function createOnlineSalesSchema(
                     publishedAt: Date
                     createdAt: Date
                     updatedAt: Date
+                    rawFrontmatter: String
+                    # Common frontmatter fields
+                    seoTitle: String
+                    seoDescription: String
                     internal: Internal!
                 }
             `;

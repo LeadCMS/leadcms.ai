@@ -2,7 +2,6 @@ import { MDXProvider } from "@mdx-js/react";
 import { graphql, PageProps } from "gatsby";
 import React from "react";
 
-import Layout from "../components/Layout";
 import mdxComponents from "../utils/mdxComponents";
 
 const HomePage: React.FC<PageProps<Queries.Query>> = ({ data }) => {
@@ -10,11 +9,9 @@ const HomePage: React.FC<PageProps<Queries.Query>> = ({ data }) => {
     const homePage = data.allOnlineSalesHome.nodes.find((page: Queries.OnlineSalesHome) => page.slug === "main")!;
 
     return (
-        <Layout>
-            <MDXProvider components={mdxComponents}>
-                {homePage.body}
-            </MDXProvider>
-        </Layout>
+        <MDXProvider components={mdxComponents}>
+            {homePage.body}
+        </MDXProvider>
     );
 };
 

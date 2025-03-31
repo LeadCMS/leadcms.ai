@@ -33,8 +33,6 @@ This project uses TypeScript exclusively. GitHub Copilot must follow these stand
 ### Project Structure
 
 - UI components in `src/components/ui/`
-- Feature components in `src/components/features/`
-- Layout components in `src/components/layout/`
 - Utility functions in `src/lib/utils.ts`
 
 ### Styling

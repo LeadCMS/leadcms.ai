@@ -3,6 +3,7 @@ import { NodePluginArgs } from "gatsby";
 import { fetchContent } from "./api";
 import { downloadMedia, extractMediaUrls, replaceMediaUrls } from "./media";
 import { PluginOptions } from "./types";
+import { extractFrontmatter } from "../src/mdx-utils";
 
 /**
  * Source nodes from OnlineSales CMS
@@ -53,20 +54,33 @@ export async function sourceOnlineSalesNodes(
                 item.localCoverImage = localMediaPaths[coverImagePath];
             }
 
+            // Extract frontmatter from MDX content if available
+            const frontmatterData = item.body ? extractFrontmatter(item.body) : null;
+            
+            // Merge frontmatter into the content item
+            const processedItem = {
+                ...item,
+                ...frontmatterData?.frontmatter,
+                // If frontmatter was extracted, use the cleaned content, otherwise keep the original
+                body: frontmatterData ? frontmatterData.content : item.body,
+                // Store the raw frontmatter YAML for reference
+                rawFrontmatter: frontmatterData?.rawFrontmatter,
+            };
+
             const nodeType = `OnlineSales${item.type.charAt(0).toUpperCase() + item.type.slice(1)}`;
 
             const nodeId = createNodeId(`onlinesales-${item.type}-${item.id}`);
-            const nodeContent = JSON.stringify(item);
+            const nodeContent = JSON.stringify(processedItem);
 
             const node = {
-                ...item,
+                ...processedItem,
                 id: nodeId,
                 parent: null,
                 children: [],
                 internal: {
                     type: nodeType,
                     content: nodeContent,
-                    contentDigest: createContentDigest(item),
+                    contentDigest: createContentDigest(processedItem),
                 },
             };
 
