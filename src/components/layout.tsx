@@ -16,22 +16,22 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
       <div className="flex min-h-screen flex-col">
         <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
           <div className="container flex h-16 items-center justify-between max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex items-center gap-2">
+            <Link to="/" className="flex items-center gap-2">
               <Package className="h-6 w-6" />
               <span className="text-xl font-bold">OnlineSales</span>
-            </div>
+            </Link>
             <nav className="hidden md:flex gap-6">
-              <Link to="#features" className="text-sm font-medium hover:underline underline-offset-4">
+              <Link to="/#features" className="text-sm font-medium hover:underline underline-offset-4">
                 Features
               </Link>
-              <Link to="#why" className="text-sm font-medium hover:underline underline-offset-4">
+              <Link to="/#why" className="text-sm font-medium hover:underline underline-offset-4">
                 Why OnlineSales
               </Link>
-              <Link to="#compare" className="text-sm font-medium hover:underline underline-offset-4">
+              <Link to="/#compare" className="text-sm font-medium hover:underline underline-offset-4">
                 Compare
               </Link>
-              <Link to="#help" className="text-sm font-medium hover:underline underline-offset-4">
-                Expert Help
+              <Link to="/contact-us" className="text-sm font-medium hover:underline underline-offset-4">
+                Contact Us
               </Link>
             </nav>
             <div className="flex items-center gap-4">

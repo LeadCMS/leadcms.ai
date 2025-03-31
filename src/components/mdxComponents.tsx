@@ -17,6 +17,7 @@ import {
 } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import * as LucideIcons from "lucide-react";
+import { ContactUs } from "@/components/contact-us";
 
 // UI components and icons for MDX use
 const uiComponents = {
@@ -32,6 +33,7 @@ const uiComponents = {
   TabsList,
   TabsTrigger,
   Badge,
+  ContactUs
 };
 
 // Use React's built-in HTML element prop types instead of custom interfaces

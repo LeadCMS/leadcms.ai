@@ -5,11 +5,14 @@ import type { GatsbyConfig } from "gatsby";
 dotenv.config();
 
 // Validate required environment variables
-if (!process.env.ONLINESALES_API_URL) {
+if (!process.env.GATSBY_ONLINESALES_API_URL) {
   throw new Error(
     "The ONLINESALES_API_URL environment variable is required. Please check your .env file."
   );
 }
+
+
+const apiUrl = process.env.GATSBY_ONLINESALES_API_URL;
 
 const config: GatsbyConfig = {
   siteMetadata: {
@@ -66,7 +69,7 @@ const config: GatsbyConfig = {
     {
       resolve: "gatsby-source-onlinesales",
       options: {
-        onlineSalesUrl: process.env.ONLINESALES_API_URL,
+        onlineSalesUrl: apiUrl,
         language: process.env.ONLINESALES_LANGUAGE || "en",
       },
     },
