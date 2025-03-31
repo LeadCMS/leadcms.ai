@@ -12,3 +12,6 @@ src/gatsby-types.d.ts
 .pnp.*
 yarn-error.log
 .env
+
+# User-specific settings
+.vscode/settings.json

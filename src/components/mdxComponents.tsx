@@ -18,6 +18,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import * as LucideIcons from "lucide-react";
 import { ContactUs } from "@/components/contact-us";
+import { MDXProviderComponents } from '@mdx-js/react';
 
 // UI components and icons for MDX use
 const uiComponents = {
@@ -118,4 +119,4 @@ export default {
   ...LucideIcons,
   ...baseComponents,
   ...uiComponents,
-};
+} as unknown as MDXProviderComponents;

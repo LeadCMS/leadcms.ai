@@ -3,7 +3,7 @@ import { graphql, PageProps } from "gatsby";
 import { MDXProvider } from "@mdx-js/react";
 import { MDXRenderer } from "gatsby-plugin-mdx";
 import mdxComponents from "@/components/mdxComponents";
-import { Layout } from "@/components/Layout";
+import { Layout } from "@/components/layout";
 
 interface ContentPageData {
   content: {
