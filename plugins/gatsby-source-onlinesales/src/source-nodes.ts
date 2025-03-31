@@ -1,7 +1,7 @@
 import { NodePluginArgs } from "gatsby";
 import { createRemoteFileNode } from "gatsby-source-filesystem";
 import { fetchContent } from "./api";
-import { PluginOptions, ContentDetailsDto } from "./types";
+import { PluginOptions } from "./types";
 
 /**
  * Source nodes from OnlineSales CMS.
