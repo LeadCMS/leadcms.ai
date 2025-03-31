@@ -5,7 +5,7 @@ import { MDXRenderer } from "gatsby-plugin-mdx";
 import mdxComponents from "@/lib/utils/mdxComponents";
 import { Layout } from "@/components/layout/Layout";
 
-interface HomePageData {
+interface ContentPageData {
   content: {
     id: string;
     slug: string;
@@ -15,7 +15,7 @@ interface HomePageData {
   };
 }
 
-export const HomePage: React.FC<PageProps<HomePageData>> = ({ data }) => {
+export const ContentPage: React.FC<PageProps<ContentPageData>> = ({ data }) => {
   const { content } = data;
 
   if (!content) {
@@ -23,8 +23,7 @@ export const HomePage: React.FC<PageProps<HomePageData>> = ({ data }) => {
       <Layout>
         <main className="flex-1">
           <div className="container py-12">
-            <h1 className="text-3xl font-bold">Home page content not found</h1>
-            <p>Please create a content entry with type "home" and slug "main".</p>
+            <h1 className="text-3xl font-bold">Content not found</h1>
           </div>
         </main>
       </Layout>
@@ -43,8 +42,8 @@ export const HomePage: React.FC<PageProps<HomePageData>> = ({ data }) => {
 };
 
 export const query = graphql`
-  query HomePageQuery {
-    content: content(type: { eq: "home" }, slug: { eq: "main" }) {
+  query ContentPageQuery($slug: String!) {
+    content: content(slug: { eq: $slug }) {
       id
       slug
       childMdx {
@@ -54,4 +53,4 @@ export const query = graphql`
   }
 `;
 
-export { HomePage as default };
+export { ContentPage as default };

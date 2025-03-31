@@ -1,5 +1,65 @@
 import React, { ComponentPropsWithoutRef } from 'react';
-import { cn } from '@/lib/utils';
+
+import { Button } from "@/components/ui/button";
+import { Link } from "@/components/ui/link";
+import { 
+  Card, 
+  CardContent, 
+  CardDescription, 
+  CardHeader, 
+  CardTitle 
+} from "@/components/ui/card";
+import { 
+  Tabs, 
+  TabsContent, 
+  TabsList, 
+  TabsTrigger 
+} from "@/components/ui/tabs";
+import { Badge } from "@/components/ui/badge";
+import {
+  CheckCircle,
+  Code,
+  Database,
+  GitBranch,
+  Globe,
+  Lock,
+  Package,
+  Server,
+  Settings,
+  ShieldCheck,
+  Zap,
+} from "lucide-react";
+
+// UI components and icons for MDX use
+const uiComponents = {
+  Button,
+  Link,
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+  Badge,
+};
+
+// Lucide icons
+const iconComponents = {
+  CheckCircle,
+  Code,
+  Database,
+  GitBranch,
+  Globe,
+  Lock,
+  Package,
+  Server,
+  Settings,
+  ShieldCheck,
+  Zap,
+};
 
 // Use React's built-in HTML element prop types instead of custom interfaces
 type HeadingProps = ComponentPropsWithoutRef<'h1'>;
@@ -8,67 +68,79 @@ type AnchorProps = ComponentPropsWithoutRef<'a'>;
 type ListProps = ComponentPropsWithoutRef<'ul'>;
 type ListItemProps = ComponentPropsWithoutRef<'li'>;
 type BlockquoteProps = ComponentPropsWithoutRef<'blockquote'>;
-type CodeProps = ComponentPropsWithoutRef<'code'>;
-type PreProps = ComponentPropsWithoutRef<'pre'>;
 type ImageProps = ComponentPropsWithoutRef<'img'>;
 type TableProps = ComponentPropsWithoutRef<'table'>;
 type TableCellProps = ComponentPropsWithoutRef<'td'>;
 type TableHeadProps = ComponentPropsWithoutRef<'th'>;
+type DivProps = ComponentPropsWithoutRef<'div'>;
+type SectionProps = ComponentPropsWithoutRef<'section'>;
+type InputProps = ComponentPropsWithoutRef<'input'>;
+type TextareaProps = ComponentPropsWithoutRef<'textarea'>;
+type LabelProps = ComponentPropsWithoutRef<'label'>;
+type FormProps = ComponentPropsWithoutRef<'form'>;
+type SpanProps = ComponentPropsWithoutRef<'span'>;
 
 // Define components using proper React types
-const mdxComponents = {
+const baseComponents = {
   h1: ({ children, ...props }: HeadingProps) => (
-    <h1 className="text-3xl font-bold mb-4" {...props}>
+    <h1 {...props}>
       {children}
     </h1>
   ),
   h2: ({ children, ...props }: HeadingProps) => (
-    <h2 className="text-2xl font-bold mb-3" {...props}>
+    <h2 {...props}>
       {children}
     </h2>
   ),
   h3: ({ children, ...props }: HeadingProps) => (
-    <h3 className="text-xl font-bold mb-2" {...props}>
+    <h3 {...props}>
       {children}
     </h3>
   ),
   h4: ({ children, ...props }: HeadingProps) => (
-    <h4 className="text-lg font-bold mb-2" {...props}>
+    <h4 {...props}>
       {children}
     </h4>
   ),
-  p: (props: ParagraphProps) => <p className="mb-4" {...props} />,
+  p: (props: ParagraphProps) => <p {...props} />,
   a: ({ children, ...props }: AnchorProps) => (
-    <a className="text-blue-600 hover:text-blue-800 underline" {...props}>
+    <a {...props}>
       {children}
     </a>
   ),
-  ul: (props: ListProps) => <ul className="list-disc pl-6 mb-4" {...props} />,
-  ol: (props: ListProps) => <ol className="list-decimal pl-6 mb-4" {...props} />,
-  li: (props: ListItemProps) => <li className="mb-1" {...props} />,
+  ul: (props: ListProps) => <ul {...props} />,
+  ol: (props: ListProps) => <ol {...props} />,
+  li: (props: ListItemProps) => <li {...props} />,
   blockquote: (props: BlockquoteProps) => (
-    <blockquote className={cn("border-l-4 border-gray-300 pl-4 italic my-4")} {...props} />
-  ),
-  code: (props: CodeProps) => <code className="bg-gray-100 p-1 rounded text-sm" {...props} />,
-  pre: (props: PreProps) => (
-    <pre className="bg-gray-800 text-white p-4 rounded overflow-auto my-4" {...props} />
-  ),
+    <blockquote {...props} />
+  ),  
+  
   img: (props: ImageProps) => (
-    <img className="max-w-full h-auto my-4" {...props} alt={props.alt || ''} />
+    <img {...props} alt={props.alt || ''} />
   ),
   table: (props: TableProps) => (
-    <div className="overflow-x-auto">
-      <table className="min-w-full divide-y divide-gray-200 my-4" {...props} />
+    <div>
+      <table {...props} />
     </div>
   ),
   th: (props: TableHeadProps) => (
-    <th
-      className="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-      {...props}
-    />
+    <th {...props} />
   ),
-  td: (props: TableCellProps) => <td className="px-6 py-4 whitespace-nowrap" {...props} />,
-  hr: () => <hr className="my-8 border-t border-gray-300" />,
+  td: (props: TableCellProps) => <td {...props} />,
+  hr: () => <hr />,
+  div: (props: DivProps) => <div {...props} />,
+  section: (props: SectionProps) => <section {...props} />,
+  input: (props: InputProps) => <input {...props} />,
+  textarea: (props: TextareaProps) => <textarea {...props} />,
+  label: (props: LabelProps) => <label {...props} />,
+  form: (props: FormProps) => <form {...props} />,
+  span: (props: SpanProps) => <span {...props} />,
 };
 
-export default mdxComponents;
+// Combined components object for MDXProvider
+
+export default {
+  ...baseComponents,
+  ...uiComponents,
+  ...iconComponents,
+};

@@ -1,97 +1,134 @@
 import { NodePluginArgs } from "gatsby";
-
+import { createRemoteFileNode } from "gatsby-source-filesystem";
 import { fetchContent } from "./api";
-import { downloadMedia, extractMediaUrls, replaceMediaUrls } from "./media";
-import { PluginOptions } from "./types";
-import { extractFrontmatter } from "../src/mdx-utils";
+import { PluginOptions, ContentDetailsDto } from "./types";
 
 /**
- * Source nodes from OnlineSales CMS
+ * Source nodes from OnlineSales CMS.
  */
 export async function sourceOnlineSalesNodes(
     args: NodePluginArgs,
     pluginOptions: PluginOptions
 ): Promise<void> {
-    const { actions, createNodeId, createContentDigest, reporter } = args;
+    const { actions, createNodeId, createContentDigest, reporter, getCache } = args;
     const { createNode } = actions;
-    const { apiUrl, language } = pluginOptions;
-    const staticFolder = pluginOptions.staticFolder || "./public/static";
+    const { onlineSalesUrl, language } = pluginOptions;
 
-    if (!apiUrl) {
-        reporter.panic("apiUrl is required for gatsby-source-onlinesales plugin");
+    if (!onlineSalesUrl) {
+        reporter.panic("onlineSalesUrl is required for gatsby-source-onlinesales plugin");
         return;
     }
 
-    reporter.info(`Fetching content from ${apiUrl}`);
+    reporter.info(`Fetching content from ${onlineSalesUrl}`);
 
     try {
-        const allContent = await fetchContent(apiUrl, language);
-
+        const allContent = await fetchContent(onlineSalesUrl, language);
         reporter.info(`Processing ${allContent.length} content items`);
 
         for (const item of allContent) {
-            const bodyMediaUrls = extractMediaUrls(item.body);
-            const coverImagePath =
-                item.coverImageUrl && item.coverImageUrl.startsWith("/api/media/")
-                    ? item.coverImageUrl.replace("/api/media/", "")
-                    : null;
+            // 1) Convert coverImageUrl to absolute
+            const absoluteCoverUrl = makeAbsoluteUrl(item.coverImageUrl, onlineSalesUrl);
 
-            const allMediaPaths: string[] = [...bodyMediaUrls];
-            if (coverImagePath) allMediaPaths.push(coverImagePath);
+            // 2) Replace relative /api/media URLs inside the body
+            const originalBody = item.body ?? "";
+            const finalMdxContent = replaceRelativeMediaPaths(originalBody, onlineSalesUrl);
 
-            const localMediaPaths: Record<string, string> = {};
-            for (const mediaPath of allMediaPaths) {
-                reporter.verbose(`Downloading media: ${mediaPath}`);
-                const localPath = await downloadMedia(apiUrl, mediaPath, staticFolder);
-                if (localPath) {
-                    localMediaPaths[mediaPath] = localPath;
-                }
-            }
-
-            item.body = replaceMediaUrls(item.body, localMediaPaths);
-
-            if (coverImagePath && localMediaPaths[coverImagePath]) {
-                item.localCoverImage = localMediaPaths[coverImagePath];
-            }
-
-            // Extract frontmatter from MDX content if available
-            const frontmatterData = item.body ? extractFrontmatter(item.body) : null;
-            
-            // Merge frontmatter into the content item
-            const processedItem = {
-                ...item,
-                ...frontmatterData?.frontmatter,
-                // If frontmatter was extracted, use the cleaned content, otherwise keep the original
-                body: frontmatterData ? frontmatterData.content : item.body,
-                // Store the raw frontmatter YAML for reference
-                rawFrontmatter: frontmatterData?.rawFrontmatter,
+            // 3) We store top-level fields (so user can query them easily),
+            //    but the real parsing is done by gatsby-plugin-mdx from internal.content.
+            //    We'll place finalMdxContent in internal.content, with mediaType text/markdown.
+            const nodeData = {
+                ...item, // spread in normal fields: id, title, description, etc.
+                body: originalBody, // keep the original body if you want direct access
+                coverImageUrl: absoluteCoverUrl, // store absolute version at top-level
             };
 
-            const nodeType = `OnlineSales${item.type.charAt(0).toUpperCase() + item.type.slice(1)}`;
-
             const nodeId = createNodeId(`onlinesales-${item.type}-${item.id}`);
-            const nodeContent = JSON.stringify(processedItem);
 
+            // 4) Create the node object
             const node = {
-                ...processedItem,
+                ...nodeData,
                 id: nodeId,
                 parent: null,
                 children: [],
                 internal: {
-                    type: nodeType,
-                    content: nodeContent,
-                    contentDigest: createContentDigest(processedItem),
+                    type: `Content`,
+                    // Gatsby plugin MDX will parse this content
+                    content: finalMdxContent,
+                    mediaType: "text/markdown",
+                    contentDigest: createContentDigest(finalMdxContent)
                 },
             };
 
-            createNode(node);
+            // 5) Create the node in Gatsby
+            await createNode(node as any);
+
+            // 6) If you want to handle coverImageUrl as a local file, create a child File node:
+            //    then link it by storing a field named coverImage___NODE.
+            //    This lets you query `coverImage { childImageSharp { gatsbyImageData } }`
+            if (absoluteCoverUrl) {
+                try {
+                    const fileNode = await createRemoteFileNode({
+                        url: absoluteCoverUrl,
+                        parentNodeId: nodeId,
+                        createNode,
+                        createNodeId,
+                        getCache,
+
+                    });
+                    if (fileNode) {
+                        // create a field that links the file node
+                        actions.createNodeField({
+                            node: node as any,
+                            name: `coverImage`,
+                            value: fileNode.id,
+                        });
+                    }
+                } catch (err) {
+                    reporter.warn(
+                        `Failed to download cover image from ${absoluteCoverUrl}: ${err}`
+                    );
+                }
+            }
         }
 
         reporter.info(`Successfully processed ${allContent.length} OnlineSales content items`);
     } catch (error) {
         reporter.panic(
-            `Failed to source content from OnlineSales CMS: ${error instanceof Error ? error.message : String(error)}`,
+            `Failed to source content from OnlineSales CMS: ${
+                error instanceof Error ? error.message : String(error)
+            }`,
             error instanceof Error ? error : new Error(String(error))
         );
     }
+}
+
+
+/**
+ * Convert /api/media/... references to absolute URLs using baseUrl or apiUrl.
+ */
+function makeAbsoluteUrl(
+    relativeOrFullUrl: string | undefined,
+    baseDomain: string
+): string | undefined {
+    if (!relativeOrFullUrl) return undefined;
+
+    // If it's already absolute, return as is:
+    try {
+        new URL(relativeOrFullUrl);
+        return relativeOrFullUrl; // no error => it's absolute
+    } catch {
+        // Otherwise, construct from base
+        return `${baseDomain.replace(/\/$/, "")}${relativeOrFullUrl}`;
+    }
+}
+
+/**
+ * Replace occurrences of /api/media/... in the body with absolute URLs,
+ * so that remark/MDX image plugins can handle them properly.
+ */
+function replaceRelativeMediaPaths(body: string, baseDomain: string): string {
+    return body.replace(
+        /(\]\(|src=")(\/api\/media[^\)"]+)/g,
+        `$1${baseDomain.replace(/\/$/, "")}$2`
+    );
 }

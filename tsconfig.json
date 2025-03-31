@@ -29,5 +29,5 @@
         "./tailwind.config.ts",
         "./plugins/**/*.ts",
         "./plugins/**/*.tsx"
-    ]
+, "original-design.tsx"    ]
 }

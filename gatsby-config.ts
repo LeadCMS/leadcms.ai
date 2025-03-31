@@ -6,75 +6,115 @@ dotenv.config();
 
 // Validate required environment variables
 if (!process.env.ONLINESALES_API_URL) {
-    throw new Error(
-        "The ONLINESALES_API_URL environment variable is required. Please check your .env file."
-    );
+  throw new Error(
+    "The ONLINESALES_API_URL environment variable is required. Please check your .env file."
+  );
 }
 
 const config: GatsbyConfig = {
-    siteMetadata: {
-        title: `OnlineSales`,
-        siteUrl: `https://onlinesales.tech`,
+  siteMetadata: {
+    title: `OnlineSales`,
+    siteUrl: `https://onlinesales.tech`,
+  },
+  graphqlTypegen: true,
+  plugins: [
+    // 1. Tailwind/PostCSS pipeline
+    {
+      resolve: "gatsby-plugin-postcss",
+      options: {
+        postcssOptions: {
+          plugins: [require("tailwindcss"), require("autoprefixer")],
+        },
+      },
     },
-    graphqlTypegen: true,
-    plugins: [
-        {
-            resolve: "gatsby-plugin-postcss",
-            options: {
-                postcssOptions: {
-                    plugins: [require("tailwindcss"), require("autoprefixer")],
-                },
-            },
+
+    // 2. Google Analytics (optional)
+    {
+      resolve: "gatsby-plugin-google-gtag",
+      options: {
+        trackingIds: [process.env.GA_TRACKING_ID].filter(Boolean),
+        pluginConfig: {
+          head: true,
         },
-        {
-            resolve: "gatsby-plugin-google-gtag",
+      },
+    },
+
+    // 3. Gatsby core image plugins (process images in the data layer)
+    "gatsby-plugin-image",
+    "gatsby-plugin-sharp",
+    "gatsby-transformer-sharp",
+
+    // 4. Source local files if needed (images/pages)
+    {
+      resolve: "gatsby-source-filesystem",
+      options: {
+        name: "images",
+        path: "./src/images/",
+      },
+      __key: "images",
+    },
+    {
+      resolve: "gatsby-source-filesystem",
+      options: {
+        name: "pages",
+        path: "./src/pages/",
+      },
+      __key: "pages",
+    },
+
+    // 5. Source your OnlineSales CMS content
+    {
+      resolve: "gatsby-source-onlinesales",
+      options: {
+        onlineSalesUrl: process.env.ONLINESALES_API_URL,
+        language: process.env.ONLINESALES_LANGUAGE || "en",
+      },
+    },
+
+    // 6. gatsby-mdx-remote plugin: This bridges remote MDX content
+    // into a temporary file so that gatsby-plugin-mdx can process it.
+    // {
+    //   resolve: "gatsby-mdx-remote",
+    //   options: {
+    //     mdxNodeTypes: {
+    //       Content: {
+    //         // The field in your Content nodes that contains the raw MDX (frontmatter + MDX)
+    //         mdxField: "body",
+    //         // Optionally, if you have a separate frontmatter field, specify it:
+    //         // mdxFrontmatterField: "frontmatter",
+    //         preprocessImages: true, // download remote images referenced in MDX if needed
+    //       },
+    //     },
+    //   },
+    // },
+
+    // 7. MDX plugin – transforms any nodes with mediaType "text/markdown" or "text/mdx"
+    {
+      resolve: "gatsby-plugin-mdx",
+      options: {
+        gatsbyRemarkPlugins: [
+          {
+            // For remote images embedded in MDX:
+            // npm install gatsby-remark-images-remote
+            resolve: "gatsby-remark-images-remote",
             options: {
-                // You need to provide at least one tracking ID
-                trackingIds: [
-                    process.env.GA_TRACKING_ID, // Replace with your actual Google Analytics tracking ID
-                ],
-                // Optional configuration options
-                pluginConfig: {
-                    // Puts tracking script in the head instead of the body
-                    head: true,
-                },
+              maxWidth: 1200,
+              linkImagesToOriginal: false
             },
-        },
-        "gatsby-plugin-image",
-        "gatsby-plugin-sitemap",
-        {
-            resolve: "gatsby-plugin-manifest",
-            options: {
-                icon: "src/images/icon.png",
-            },
-        },
-        "gatsby-plugin-mdx",
-        "gatsby-plugin-sharp",
-        "gatsby-transformer-sharp",
-        {
-            resolve: "gatsby-source-filesystem",
-            options: {
-                name: "images",
-                path: "./src/images/",
-            },
-            __key: "images",
-        },
-        {
-            resolve: "gatsby-source-filesystem",
-            options: {
-                name: "pages",
-                path: "./src/pages/",
-            },
-            __key: "pages",
-        },
-        {
-            resolve: "gatsby-source-onlinesales",
-            options: {
-                apiUrl: process.env.ONLINESALES_API_URL,
-                language: process.env.ONLINESALES_LANGUAGE || "en",
-            },
-        },
-    ],
+          },
+        ],
+      },
+    },
+
+    // 8. Sitemap, Manifest, and other site-level plugins
+    "gatsby-plugin-sitemap",
+    {
+      resolve: "gatsby-plugin-manifest",
+      options: {
+        icon: "src/images/icon.png",
+      },
+    },
+  ],
 };
 
 export default config;
