@@ -43,7 +43,7 @@ export const ContentPage: React.FC<PageProps<ContentPageData>> = ({ data }) => {
 
 export const query = graphql`
   query ContentPageQuery($slug: String!) {
-    content: content(slug: { eq: $slug }) {
+    content: onlineSalesContent(slug: { eq: $slug }) {
       id
       slug
       childMdx {

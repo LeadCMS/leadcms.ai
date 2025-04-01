@@ -1,6 +1,6 @@
 import { GatsbyNode } from "gatsby";
 import { sourceOnlineSalesNodes } from "./src/source-nodes";
-import { PluginOptions } from "./src/types";
+import { PluginOptions, ONLINESALES_NODE_TYPE } from "./src/types";
 
 /**
  * Implements Gatsby's sourceNodes API.
@@ -14,7 +14,7 @@ export const sourceNodes: GatsbyNode["sourceNodes"] = async (
 };
 
 /**
- * Creates a single node type `Content` and links its coverImage to File.
+ * Creates a single node type `OnlineSalesContent` and links its coverImage to File.
  * We rely on `gatsby-plugin-mdx` to parse the `internal.content` as frontmatter + MDX.
  */
 export const createSchemaCustomization: GatsbyNode["createSchemaCustomization"] = async ({
@@ -27,7 +27,7 @@ export const createSchemaCustomization: GatsbyNode["createSchemaCustomization"] 
   // but also expose top-level fields for convenience. coverImage is a File link.
   // The "seoTitle" and "seoDescription" fields can be optional or removed if not used.
   const typeDefs = `
-    type Content implements Node {
+    type ${ONLINESALES_NODE_TYPE} implements Node {
       # Basic fields
       id: ID!
       title: String
@@ -57,5 +57,5 @@ export const createSchemaCustomization: GatsbyNode["createSchemaCustomization"] 
   `;
 
   createTypes(typeDefs);
-  reporter.info("Created single Content schema type");
+  reporter.info(`Created single ${ONLINESALES_NODE_TYPE} schema type`);
 };

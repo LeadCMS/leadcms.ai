@@ -2,7 +2,6 @@ import * as React from "react";
 import { Link } from "gatsby";
 import { Button } from "@/components/ui/button";
 import { Package, GitBranch } from "lucide-react";
-import { StyleSafelist } from "./ui/safelist";
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -11,8 +10,6 @@ interface LayoutProps {
 export const Layout: React.FC<LayoutProps> = ({ children }) => {
   return (
     <>
-      <StyleSafelist />
-      
       <div className="flex min-h-screen flex-col">
         <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
           <div className="container flex h-16 items-center justify-between max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

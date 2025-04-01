@@ -74,24 +74,7 @@ const config: GatsbyConfig = {
       },
     },
 
-    // 6. gatsby-mdx-remote plugin: This bridges remote MDX content
-    // into a temporary file so that gatsby-plugin-mdx can process it.
-    // {
-    //   resolve: "gatsby-mdx-remote",
-    //   options: {
-    //     mdxNodeTypes: {
-    //       Content: {
-    //         // The field in your Content nodes that contains the raw MDX (frontmatter + MDX)
-    //         mdxField: "body",
-    //         // Optionally, if you have a separate frontmatter field, specify it:
-    //         // mdxFrontmatterField: "frontmatter",
-    //         preprocessImages: true, // download remote images referenced in MDX if needed
-    //       },
-    //     },
-    //   },
-    // },
-
-    // 7. MDX plugin – transforms any nodes with mediaType "text/markdown" or "text/mdx"
+    // 6. MDX plugin – transforms any nodes with mediaType "text/markdown" or "text/mdx"
     {
       resolve: "gatsby-plugin-mdx",
       options: {
@@ -109,7 +92,7 @@ const config: GatsbyConfig = {
       },
     },
 
-    // 8. Sitemap, Manifest, and other site-level plugins
+    // 7. Sitemap, Manifest, and other site-level plugins
     "gatsby-plugin-sitemap",
     {
       resolve: "gatsby-plugin-manifest",

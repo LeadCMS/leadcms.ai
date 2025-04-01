@@ -1,7 +1,7 @@
 import { NodePluginArgs } from "gatsby";
 import { createRemoteFileNode } from "gatsby-source-filesystem";
 import { fetchContent } from "./api";
-import { PluginOptions } from "./types";
+import { PluginOptions, ONLINESALES_NODE_TYPE } from "./types";
 
 /**
  * Source nodes from OnlineSales CMS.
@@ -51,7 +51,7 @@ export async function sourceOnlineSalesNodes(
                 parent: null,
                 children: [],
                 internal: {
-                    type: `Content`,
+                    type: ONLINESALES_NODE_TYPE,
                     // Gatsby plugin MDX will parse this content
                     content: finalMdxContent,
                     mediaType: "text/markdown",

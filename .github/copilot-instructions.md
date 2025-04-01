@@ -15,7 +15,6 @@ This project uses TypeScript exclusively. GitHub Copilot must follow these stand
 - Nodes must set `internal.mediaType = "text/markdown"` to trigger MDX transformation.
 - Gatsby automatically creates `childMdx` under these nodes using `gatsby-plugin-mdx`.
 
-
 ### Images in MDX
 
 - Images are remote and included either via markdown syntax (`![](url)`) or JSX (`<Image src="/api/media/..." />`).

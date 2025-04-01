@@ -44,7 +44,7 @@ export const HomePage: React.FC<PageProps<HomePageData>> = ({ data }) => {
 
 export const query = graphql`
   query HomePageQuery {
-    content: content(type: { eq: "home" }, slug: { eq: "main" }) {
+    content: onlineSalesContent(type: { eq: "home" }, slug: { eq: "main" }) {
       id
       slug
       childMdx {
