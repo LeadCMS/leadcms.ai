@@ -39,10 +39,15 @@ const config: Config = {
                 primary: {
                     DEFAULT: "hsl(var(--primary))",
                     foreground: "hsl(var(--primary-foreground))",
+                    400: "hsl(var(--primary400))",
                 },
                 secondary: {
                     DEFAULT: "hsl(var(--secondary))",
                     foreground: "hsl(var(--secondary-foreground))",
+                    500: "hsl(var(--secondary500))",
+                },
+                tertiary: {
+                    100: "hsl(var(--tertiary100))",
                 },
                 muted: {
                     DEFAULT: "hsl(var(--muted))",
@@ -55,6 +60,12 @@ const config: Config = {
                 destructive: {
                     DEFAULT: "hsl(var(--destructive))",
                     foreground: "hsl(var(--destructive-foreground))",
+                },
+                success: {
+                    500: "hsl(var(--success500))",
+                },
+                error: {
+                    500: "hsl(var(--error500))",
                 },
                 border: "hsl(var(--border))",
                 input: "hsl(var(--input))",
@@ -116,6 +127,11 @@ const config: Config = {
         'text-sm', 'text-base', 'text-lg', 'text-xl', 'text-2xl', 'text-3xl', 'text-4xl',
         'font-normal', 'font-medium', 'font-semibold', 'font-bold',
         'text-primary', 'text-secondary', 'text-muted-foreground', 'text-primary-foreground',
+        
+        // New color classes to safelist
+        'text-primary400', 'text-secondary500', 'text-tertiary100', 'text-success500', 'text-error500',
+        'bg-primary400', 'bg-secondary500', 'bg-tertiary100', 'bg-success500', 'bg-error500',
+        'border-primary400', 'border-secondary500', 'border-tertiary100', 'border-success500', 'border-error500',
         
         // Backgrounds and borders
         'bg-primary', 'bg-secondary', 'bg-muted', 'bg-background',

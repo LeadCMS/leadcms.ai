@@ -10,9 +10,6 @@
       "runtimeArgs": ["--inspect"],
       "console": "integratedTerminal",
       "runtimeExecutable": "${env:HOME}/.nvm/versions/node/v18.20.7/bin/node",
-      // "env": {
-      //   "GATSBY_CONTENT_PATH": "/Users/peterliapin/Projects/XLTools/site-content"
-      // },
       "preLaunchTask": "gatsby-clean"
     },
     {

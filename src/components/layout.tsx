@@ -1,7 +1,7 @@
 import * as React from "react";
 import { Link } from "gatsby";
 import { Button } from "@/components/ui/button";
-import { Package, GitBranch } from "lucide-react";
+import { GitBranch } from "lucide-react";
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -14,7 +14,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
         <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
           <div className="container flex h-16 items-center justify-between max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <Link to="/" className="flex items-center gap-2">
-              <Package className="h-6 w-6" />
+              <img src="/images/icon-192x192.png" alt="LeadCMS Logo" className="h-12 w-12" />
               <span className="text-xl font-bold">LeadCMS</span>
             </Link>
             <nav className="hidden md:flex gap-6">
@@ -33,7 +33,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
             </nav>
             <div className="flex items-center gap-4">
               <Link
-                to="https://github.com/peterliapin/leadcms.core"
+                to="https://github.com/LeadCMS"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="hidden md:flex items-center gap-2 text-sm font-medium"
@@ -54,7 +54,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
           <div className="container max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex flex-col md:flex-row items-center justify-between gap-4">
               <div className="flex items-center gap-2">
-                <Package className="h-6 w-6" />
+                <img src="/images/icon-192x192.png" alt="LeadCMS Logo" className="h-12 w-12" />
                 <p className="text-sm text-muted-foreground">
                   © {new Date().getFullYear()} LeadCMS. All rights reserved.
                 </p>
@@ -70,7 +70,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
                   Docs
                 </Link>
                 <Link
-                  to="https://github.com/peterliapin/leadcms.core"
+                  to="https://github.com/LeadCMS"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-sm font-medium text-muted-foreground hover:underline underline-offset-4"
@@ -82,6 +82,6 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
           </div>
         </footer>
       </div>
-      </>    
+    </>
   );
 };

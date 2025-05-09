@@ -11,4 +11,4 @@ export interface PluginOptions extends GatsbyPluginOptions {
 /**
  * The Gatsby node type for LeadCMS content
  */
-export const LEADCMS_NODE_TYPE = 'LeadCMSContent';
+export const LEADCMS_NODE_TYPE = 'leadCmsContent';

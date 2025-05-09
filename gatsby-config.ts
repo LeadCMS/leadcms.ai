@@ -11,7 +11,6 @@ if (!process.env.GATSBY_LEADCMS_API_URL) {
   );
 }
 
-
 const apiUrl = process.env.GATSBY_LEADCMS_API_URL;
 
 const config: GatsbyConfig = {
@@ -52,7 +51,7 @@ const config: GatsbyConfig = {
       resolve: "gatsby-source-filesystem",
       options: {
         name: "images",
-        path: "./src/images/",
+        path: "./static/images/",
       },
       __key: "images",
     },
@@ -97,7 +96,25 @@ const config: GatsbyConfig = {
     {
       resolve: "gatsby-plugin-manifest",
       options: {
-        icon: "src/images/icon.png",
+        icon: "static/images/favicon.png", // Ensure this file exists and is in a supported format
+        icons: [
+          {
+            src: "static/images/icon-192x192.png", // Ensure this file exists
+            sizes: "192x192",
+            type: "image/png",
+          },
+          {
+            src: "static/images/icon-512x512.png", // Ensure this file exists
+            sizes: "512x512",
+            type: "image/png",
+          },
+        ],
+        start_url: "/",
+        display: "standalone",
+        background_color: "#ffffff",
+        theme_color: "#0B0B0D",
+        name: "LeadCMS",
+        short_name: "LeadCMS",
       },
     },
   ],

@@ -14,7 +14,7 @@ export const sourceNodes: GatsbyNode["sourceNodes"] = async (
 };
 
 /**
- * Creates a single node type `LeadCMSContent` and links its coverImage to File.
+ * Creates a single node type `LeadCmsContent` and links its coverImage to File.
  * We rely on `gatsby-plugin-mdx` to parse the `internal.content` as frontmatter + MDX.
  */
 export const createSchemaCustomization: GatsbyNode["createSchemaCustomization"] = async ({
