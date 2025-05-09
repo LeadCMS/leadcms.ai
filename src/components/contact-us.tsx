@@ -69,7 +69,7 @@ export function ContactUs() {
     });
 
     try {
-      const apiUrl = process.env.GATSBY_ONLINESALES_API_URL;
+      const apiUrl = process.env.GATSBY_LEADCMS_API_URL;
 
       if (!apiUrl) {
         throw new Error(

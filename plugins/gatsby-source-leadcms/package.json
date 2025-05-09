@@ -1,7 +1,7 @@
 {
-  "name": "gatsby-source-onlinesales",
+  "name": "gatsby-source-leadcms",
   "version": "1.0.0",
-  "description": "Gatsby source plugin for OnlineSales CMS",
+  "description": "Gatsby source plugin for LeadCMS",
   "main": "index.js",
   "dependencies": {
     "axios": "^1.8.4"

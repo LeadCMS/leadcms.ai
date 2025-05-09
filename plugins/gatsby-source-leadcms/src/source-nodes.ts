@@ -1,37 +1,37 @@
 import { NodePluginArgs } from "gatsby";
 import { createRemoteFileNode } from "gatsby-source-filesystem";
 import { fetchContent } from "./api";
-import { PluginOptions, ONLINESALES_NODE_TYPE } from "./types";
+import { PluginOptions, LEADCMS_NODE_TYPE } from "./types";
 
 /**
- * Source nodes from OnlineSales CMS.
+ * Source nodes from LeadCMS CMS.
  */
-export async function sourceOnlineSalesNodes(
+export async function sourceLeadCMSNodes(
     args: NodePluginArgs,
     pluginOptions: PluginOptions
 ): Promise<void> {
     const { actions, createNodeId, createContentDigest, reporter, getCache } = args;
     const { createNode } = actions;
-    const { onlineSalesUrl, language } = pluginOptions;
+    const { LeadCMSUrl, language } = pluginOptions;
 
-    if (!onlineSalesUrl) {
-        reporter.panic("onlineSalesUrl is required for gatsby-source-onlinesales plugin");
+    if (!LeadCMSUrl) {
+        reporter.panic("LeadCMSUrl is required for gatsby-source-leadcms plugin");
         return;
     }
 
-    reporter.info(`Fetching content from ${onlineSalesUrl}`);
+    reporter.info(`Fetching content from ${LeadCMSUrl}`);
 
     try {
-        const allContent = await fetchContent(onlineSalesUrl, language);
+        const allContent = await fetchContent(LeadCMSUrl, language);
         reporter.info(`Processing ${allContent.length} content items`);
 
         for (const item of allContent) {
             // 1) Convert coverImageUrl to absolute
-            const absoluteCoverUrl = makeAbsoluteUrl(item.coverImageUrl, onlineSalesUrl);
+            const absoluteCoverUrl = makeAbsoluteUrl(item.coverImageUrl, LeadCMSUrl);
 
             // 2) Replace relative /api/media URLs inside the body
             const originalBody = item.body ?? "";
-            const finalMdxContent = replaceRelativeMediaPaths(originalBody, onlineSalesUrl);
+            const finalMdxContent = replaceRelativeMediaPaths(originalBody, LeadCMSUrl);
 
             // 3) We store top-level fields (so user can query them easily),
             //    but the real parsing is done by gatsby-plugin-mdx from internal.content.
@@ -42,7 +42,7 @@ export async function sourceOnlineSalesNodes(
                 coverImageUrl: absoluteCoverUrl, // store absolute version at top-level
             };
 
-            const nodeId = createNodeId(`onlinesales-${item.type}-${item.id}`);
+            const nodeId = createNodeId(`leadcms-${item.type}-${item.id}`);
 
             // 4) Create the node object
             const node = {
@@ -51,7 +51,7 @@ export async function sourceOnlineSalesNodes(
                 parent: null,
                 children: [],
                 internal: {
-                    type: ONLINESALES_NODE_TYPE,
+                    type: LEADCMS_NODE_TYPE,
                     // Gatsby plugin MDX will parse this content
                     content: finalMdxContent,
                     mediaType: "text/markdown",
@@ -91,10 +91,10 @@ export async function sourceOnlineSalesNodes(
             }
         }
 
-        reporter.info(`Successfully processed ${allContent.length} OnlineSales content items`);
+        reporter.info(`Successfully processed ${allContent.length} LeadCMS content items`);
     } catch (error) {
         reporter.panic(
-            `Failed to source content from OnlineSales CMS: ${
+            `Failed to source content from LeadCMS CMS: ${
                 error instanceof Error ? error.message : String(error)
             }`,
             error instanceof Error ? error : new Error(String(error))

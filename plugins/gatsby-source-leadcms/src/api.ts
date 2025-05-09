@@ -2,14 +2,14 @@ import axios from "axios";
 import { ContentDetailsDto } from "./types";
 
 /**
- * Fetch all content from OnlineSales CMS using a REST endpoint.
+ * Fetch all content from LeadCMS CMS using a REST endpoint.
  */
 export async function fetchContent(
-  onlineSalesUrl: string,
+  LeadCMSUrl: string,
   language?: string
 ): Promise<ContentDetailsDto[]> {
   const allData: ContentDetailsDto[] = [];
-  const contentUrl = new URL(`${onlineSalesUrl}/api/content`);
+  const contentUrl = new URL(`${LeadCMSUrl}/api/content`);
 
   contentUrl.searchParams.set("filter[limit]", "100");
 

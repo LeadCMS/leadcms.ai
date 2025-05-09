@@ -15,14 +15,14 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
           <div className="container flex h-16 items-center justify-between max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <Link to="/" className="flex items-center gap-2">
               <Package className="h-6 w-6" />
-              <span className="text-xl font-bold">OnlineSales</span>
+              <span className="text-xl font-bold">LeadCMS</span>
             </Link>
             <nav className="hidden md:flex gap-6">
               <Link to="/#features" className="text-sm font-medium hover:underline underline-offset-4">
                 Features
               </Link>
               <Link to="/#why" className="text-sm font-medium hover:underline underline-offset-4">
-                Why OnlineSales
+                Why LeadCMS
               </Link>
               <Link to="/#compare" className="text-sm font-medium hover:underline underline-offset-4">
                 Compare
@@ -33,7 +33,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
             </nav>
             <div className="flex items-center gap-4">
               <Link
-                to="https://github.com/peterliapin/onlinesales.core"
+                to="https://github.com/peterliapin/leadcms.core"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="hidden md:flex items-center gap-2 text-sm font-medium"
@@ -56,7 +56,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
               <div className="flex items-center gap-2">
                 <Package className="h-6 w-6" />
                 <p className="text-sm text-muted-foreground">
-                  © {new Date().getFullYear()} OnlineSales. All rights reserved.
+                  © {new Date().getFullYear()} LeadCMS. All rights reserved.
                 </p>
               </div>
               <nav className="flex gap-6">
@@ -70,7 +70,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
                   Docs
                 </Link>
                 <Link
-                  to="https://github.com/peterliapin/onlinesales.core"
+                  to="https://github.com/peterliapin/leadcms.core"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-sm font-medium text-muted-foreground hover:underline underline-offset-4"

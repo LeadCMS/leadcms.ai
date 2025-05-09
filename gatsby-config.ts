@@ -5,19 +5,19 @@ import type { GatsbyConfig } from "gatsby";
 dotenv.config();
 
 // Validate required environment variables
-if (!process.env.GATSBY_ONLINESALES_API_URL) {
+if (!process.env.GATSBY_LEADCMS_API_URL) {
   throw new Error(
-    "The ONLINESALES_API_URL environment variable is required. Please check your .env file."
+    "The LEADCMS_API_URL environment variable is required. Please check your .env file."
   );
 }
 
 
-const apiUrl = process.env.GATSBY_ONLINESALES_API_URL;
+const apiUrl = process.env.GATSBY_LEADCMS_API_URL;
 
 const config: GatsbyConfig = {
   siteMetadata: {
-    title: `OnlineSales`,
-    siteUrl: `https://onlinesales.tech`,
+    title: `LeadCMS`,
+    siteUrl: `https://leadcms.ai`,
   },
   graphqlTypegen: true,
   plugins: [
@@ -65,12 +65,12 @@ const config: GatsbyConfig = {
       __key: "pages",
     },
 
-    // 5. Source your OnlineSales CMS content
+    // 5. Source your LeadCMS CMS content
     {
-      resolve: "gatsby-source-onlinesales",
+      resolve: "gatsby-source-leadcms",
       options: {
-        onlineSalesUrl: apiUrl,
-        language: process.env.ONLINESALES_LANGUAGE || "en",
+        LeadCMSUrl: apiUrl,
+        language: process.env.LEADCMS_LANGUAGE || "en",
       },
     },
 
