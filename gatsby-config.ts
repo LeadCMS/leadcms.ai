@@ -7,7 +7,7 @@ dotenv.config();
 // Validate required environment variables
 if (!process.env.GATSBY_LEADCMS_API_URL) {
   throw new Error(
-    "The LEADCMS_API_URL environment variable is required. Please check your .env file."
+    "The GATSBY_LEADCMS_API_URL environment variable is required. Please check your .env file."
   );
 }
 
@@ -34,7 +34,7 @@ const config: GatsbyConfig = {
     {
       resolve: "gatsby-plugin-google-gtag",
       options: {
-        trackingIds: [process.env.GA_TRACKING_ID].filter(Boolean),
+        trackingIds: [process.env.GATSBY_GA_TRACKING_ID].filter(Boolean),
         pluginConfig: {
           head: true,
         },
@@ -69,7 +69,7 @@ const config: GatsbyConfig = {
       resolve: "gatsby-source-leadcms",
       options: {
         LeadCMSUrl: apiUrl,
-        language: process.env.LEADCMS_LANGUAGE || "en",
+        language: process.env.GATSBY_LEADCMS_LANGUAGE || "en",
       },
     },
 

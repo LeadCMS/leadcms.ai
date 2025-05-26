@@ -66,7 +66,12 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
                 <Link to="/privacy" className="text-sm font-medium text-muted-foreground hover:underline underline-offset-4">
                   Privacy
                 </Link>
-                <Link to="/getting-started" className="text-sm font-medium text-muted-foreground hover:underline underline-offset-4">
+                <Link 
+                  to="https://github.com/LeadCMS/leadcms.core" 
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-sm font-medium text-muted-foreground hover:underline underline-offset-4"
+                >
                   Docs
                 </Link>
                 <Link
