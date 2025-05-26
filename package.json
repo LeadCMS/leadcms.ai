@@ -2,7 +2,7 @@
     "name": "leadcms.ai",
     "version": "1.0.0",
     "private": true,
-    "description": "Lightweight, extendable headless CMS for product websites written in .NET 7",
+    "description": "Lightweight, extendable headless CMS for product websites written in .NET 8",
     "author": "Peter Liapin",
     "keywords": [
         "gatsby"
@@ -61,5 +61,10 @@
         "eslint-plugin-react-hooks": "^4.6.0",
         "prettier": "^3.2.5",
         "typescript": "5.3.3"
+    },
+    "overrides": {
+        "@mdx-js/react": {
+            "react": "^18.2.0"
+        }
     }
 }
