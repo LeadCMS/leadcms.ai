@@ -1,134 +1,149 @@
-import { NodePluginArgs } from "gatsby";
-import { createRemoteFileNode } from "gatsby-source-filesystem";
-import { fetchContent } from "./api";
-import { PluginOptions, LEADCMS_NODE_TYPE } from "./types";
+import { LeadCMSApiClient, IContentType } from "./api-client"
+import fs from "fs/promises"
+import path from "path"
+import matter from "gray-matter"
+import yaml from "js-yaml"
+import type { GatsbyCache } from "gatsby"
 
-/**
- * Source nodes from LeadCMS CMS.
- */
-export async function sourceLeadCMSNodes(
-    args: NodePluginArgs,
-    pluginOptions: PluginOptions
-): Promise<void> {
-    const { actions, createNodeId, createContentDigest, reporter, getCache } = args;
-    const { createNode } = actions;
-    const { LeadCMSUrl, language } = pluginOptions;
-
-    if (!LeadCMSUrl) {
-        reporter.panic("LeadCMSUrl is required for gatsby-source-leadcms plugin");
-        return;
-    }
-
-    reporter.info(`Fetching content from ${LeadCMSUrl}`);
-
-    try {
-        const allContent = await fetchContent(LeadCMSUrl, language);
-        reporter.info(`Processing ${allContent.length} content items`);
-
-        for (const item of allContent) {
-            // 1) Convert coverImageUrl to absolute
-            const absoluteCoverUrl = makeAbsoluteUrl(item.coverImageUrl, LeadCMSUrl);
-
-            // 2) Replace relative /api/media URLs inside the body
-            const originalBody = item.body ?? "";
-            const finalMdxContent = replaceRelativeMediaPaths(originalBody, LeadCMSUrl);
-
-            // 3) We store top-level fields (so user can query them easily),
-            //    but the real parsing is done by gatsby-plugin-mdx from internal.content.
-            //    We'll place finalMdxContent in internal.content, with mediaType text/markdown.
-            const nodeData = {
-                ...item, // spread in normal fields: id, title, description, etc.
-                body: originalBody, // keep the original body if you want direct access
-                coverImageUrl: absoluteCoverUrl, // store absolute version at top-level
-            };
-
-            const nodeId = createNodeId(`leadcms-${item.type}-${item.id}`);
-
-            // 4) Create the node object
-            const node = {
-                ...nodeData,
-                id: nodeId,
-                parent: null,
-                children: [],
-                internal: {
-                    type: LEADCMS_NODE_TYPE,
-                    // Gatsby plugin MDX will parse this content
-                    content: finalMdxContent,
-                    mediaType: "text/markdown",
-                    contentDigest: createContentDigest(finalMdxContent)
-                },
-            };
-
-            // 5) Create the node in Gatsby
-            await createNode(node as any);
-
-            // 6) If you want to handle coverImageUrl as a local file, create a child File node:
-            //    then link it by storing a field named coverImage___NODE.
-            //    This lets you query `coverImage { childImageSharp { gatsbyImageData } }`
-            if (absoluteCoverUrl) {
-                try {
-                    const fileNode = await createRemoteFileNode({
-                        url: absoluteCoverUrl,
-                        parentNodeId: nodeId,
-                        createNode,
-                        createNodeId,
-                        getCache,
-
-                    });
-                    if (fileNode) {
-                        // create a field that links the file node
-                        actions.createNodeField({
-                            node: node as any,
-                            name: `coverImage`,
-                            value: fileNode.id,
-                        });
-                    }
-                } catch (err) {
-                    reporter.warn(
-                        `Failed to download cover image from ${absoluteCoverUrl}: ${err}`
-                    );
-                }
-            }
-        }
-
-        reporter.info(`Successfully processed ${allContent.length} LeadCMS content items`);
-    } catch (error) {
-        reporter.panic(
-            `Failed to source content from LeadCMS CMS: ${
-                error instanceof Error ? error.message : String(error)
-            }`,
-            error instanceof Error ? error : new Error(String(error))
-        );
-    }
+async function loadSyncToken(cache: GatsbyCache): Promise<string | undefined> {
+	try {
+		return (await cache.get("leadcms-sync-token")) as string | undefined
+	} catch {
+		return undefined
+	}
 }
 
-
-/**
- * Convert /api/media/... references to absolute URLs using baseUrl or apiUrl.
- */
-function makeAbsoluteUrl(
-    relativeOrFullUrl: string | undefined,
-    baseDomain: string
-): string | undefined {
-    if (!relativeOrFullUrl) return undefined;
-
-    // If it's already absolute, return as is:
-    try {
-        new URL(relativeOrFullUrl);
-        return relativeOrFullUrl; // no error => it's absolute
-    } catch {
-        // Otherwise, construct from base
-        return `${baseDomain.replace(/\/$/, "")}${relativeOrFullUrl}`;
-    }
+async function saveSyncToken(cache: GatsbyCache, syncToken: string) {
+	await cache.set("leadcms-sync-token", syncToken)
 }
 
-/**
- * Replace occurrences of /api/media/... in the body with absolute URLs,
- * so that remark/MDX image plugins can handle them properly.
- */
-function replaceRelativeMediaPaths(body: string, baseDomain: string): string {
-    return body.replace(
-        /(\]\(|src=")(\/api\/media[^\)"]+)/g,
-        `$1${baseDomain.replace(/\/$/, "")}$2`
-    );
+export const onPreInit = ({ reporter }) => reporter.info("Loaded gatsby-source-leadcms plugin")
+
+export const sourceNodes = async (
+	{ reporter, cache },
+	pluginOptions: { leadCMSUrl: string; language?: string; targetDir: string },
+) => {
+	const { leadCMSUrl, language, targetDir } = pluginOptions
+	if (!leadCMSUrl || !targetDir) {
+		reporter.panic("gatsby-source-leadcms: 'leadCMSUrl' and 'targetDir' options are required!")
+		return
+	}
+
+	const api = new LeadCMSApiClient({ leadCMSUrl, language })
+	reporter.info(`gatsby-source-leadcms: Fetching content types from ${leadCMSUrl}`)
+	let contentTypes: Array<IContentType> = []
+	try {
+		contentTypes = await api.fetchContentTypes()
+	} catch (e) {
+		reporter.panic(`gatsby-source-leadcms: Failed to fetch content types: ${e}`)
+		return
+	}
+
+	await fs.mkdir(targetDir, { recursive: true })
+	const syncToken = await loadSyncToken(cache)
+	if (!syncToken) {
+		// Remove all files and folders in targetDir if starting a full sync
+		const entries = await fs.readdir(targetDir, { withFileTypes: true })
+		for (const entry of entries) {
+			const entryPath = path.join(targetDir, entry.name)
+			if (entry.isDirectory()) {
+				await fs.rm(entryPath, { recursive: true, force: true })
+			} else {
+				await fs.unlink(entryPath)
+			}
+		}
+	}
+	const {
+		items: contentRecords,
+		deleted,
+		nextSyncToken,
+	} = await api.fetchContentSyncPaged(syncToken, reporter)
+
+	for (const contentRecord of contentRecords) {
+		if (!contentRecord.body || !contentRecord.slug) continue
+		const contentType = contentTypes.find((ct) => ct.uid === contentRecord.type)
+		if (!contentType) {
+			reporter.warn(
+				`gatsby-source-leadcms: No content type found for type '${contentRecord.type}' (slug: ${contentRecord.slug})`,
+			)
+			continue
+		}
+		const { format, supportsComments, supportsCoverImage } = contentType
+
+		const omitFields = []
+		if (!supportsComments) omitFields.push("allowComments")
+		if (!supportsCoverImage) omitFields.push("coverImageUrl", "coverImageAlt")
+
+		const filteredRecord = Object.fromEntries(
+			Object.entries(contentRecord).filter(
+				([k, v]) =>
+					!omitFields.includes(k) &&
+					k !== "body" &&
+					v !== undefined &&
+					v !== null &&
+					(typeof v !== "string" || v.trim() !== "") &&
+					(Array.isArray(v) ? v.length > 0 : true),
+			),
+		)
+
+		const fileBase = path.join(targetDir, contentRecord.slug)
+		let filePath = fileBase
+		let fileContent = ""
+
+		if (format === "MDX" || format === "MD") {
+			const parsed = matter(contentRecord.body)
+			const mergedFrontmatter = {
+				...parsed.data,
+				...filteredRecord,
+			}
+			const ext = format === "MDX" ? ".mdx" : ".md"
+			filePath += ext
+			fileContent =
+				`---\n${yaml.dump(mergedFrontmatter)}---\n` + parsed.content.replace(/^\s+/, "")
+		} else if (format === "YAML") {
+			filePath += ".yaml"
+			const yamlObj = { ...filteredRecord, body: contentRecord.body }
+			fileContent = yaml.dump(yamlObj)
+		} else if (format === "JSON") {
+			filePath += ".json"
+			const jsonObj = { ...filteredRecord, body: contentRecord.body }
+			fileContent = JSON.stringify(jsonObj, null, 2)
+		} else if (format === "PlainText") {
+			filePath += ".txt"
+			fileContent = contentRecord.body
+			const meta = { ...filteredRecord }
+			await fs.writeFile(fileBase + ".meta.json", JSON.stringify(meta, null, 2), "utf8")
+		}
+
+		await fs.writeFile(filePath, fileContent, "utf8")
+		reporter.info(`gatsby-source-leadcms: Saved ${filePath}`)
+	}
+
+	// Handle deleted content
+	for (const id of deleted) {
+		const files = await fs.readdir(targetDir)
+		for (const file of files) {
+			if (file.endsWith(".meta.json")) continue
+			const filePath = path.join(targetDir, file)
+			try {
+				const content = await fs.readFile(filePath, "utf8")
+				if (content.includes(`id: ${id}`) || content.includes(`"id": ${id}`)) {
+					await fs.unlink(filePath)
+					reporter.info(`gatsby-source-leadcms: Deleted ${filePath}`)
+					const metaPath = filePath.replace(/\.[^.]+$/, ".meta.json")
+					try {
+						await fs.unlink(metaPath)
+					} catch (e) {
+						// ignore
+					}
+				}
+			} catch (e) {
+				// ignore
+			}
+		}
+	}
+
+	await saveSyncToken(cache, nextSyncToken)
+
+	reporter.info(`gatsby-source-leadcms: Imported ${contentRecords.length} posts to ${targetDir}`)
 }

@@ -41,12 +41,31 @@ const config: GatsbyConfig = {
       },
     },
 
-    // 3. Gatsby core image plugins (process images in the data layer)
+    // 3. LeadCMS remote source
+    {
+      resolve: "gatsby-source-leadcms",
+      // You can pass any serializable options to the plugin
+      options: {
+        leadCMSUrl: apiUrl,
+        language: process.env.GATSBY_LEADCMS_LANGUAGE || "en",
+        targetDir: "./content",
+      },
+    },
+
+    // 4. Source LeadCMS content from filesystem
+    {
+      resolve: "gatsby-plugin-page-creator",
+      options: {
+        path: "./content",
+      },
+    },
+
+    // 5. Gatsby core image plugins (process images in the data layer)
     "gatsby-plugin-image",
     "gatsby-plugin-sharp",
     "gatsby-transformer-sharp",
 
-    // 4. Source local files if needed (images/pages)
+    // 6. Source local files if needed (images/pages)
     {
       resolve: "gatsby-source-filesystem",
       options: {
@@ -64,34 +83,10 @@ const config: GatsbyConfig = {
       __key: "pages",
     },
 
-    // 5. Source your LeadCMS CMS content
-    {
-      resolve: "gatsby-source-leadcms",
-      options: {
-        LeadCMSUrl: apiUrl,
-        language: process.env.GATSBY_LEADCMS_LANGUAGE || "en",
-      },
-    },
+    // 7. MDX plugin – transforms any nodes with mediaType "text/markdown" or "text/mdx"
+    "gatsby-plugin-mdx",
 
-    // 6. MDX plugin – transforms any nodes with mediaType "text/markdown" or "text/mdx"
-    {
-      resolve: "gatsby-plugin-mdx",
-      options: {
-        gatsbyRemarkPlugins: [
-          {
-            // For remote images embedded in MDX:
-            // npm install gatsby-remark-images-remote
-            resolve: "gatsby-remark-images-remote",
-            options: {
-              maxWidth: 1200,
-              linkImagesToOriginal: false
-            },
-          },
-        ],
-      },
-    },
-
-    // 7. Sitemap, Manifest, and other site-level plugins
+    // 8. Sitemap, Manifest, and other site-level plugins
     "gatsby-plugin-sitemap",
     {
       resolve: "gatsby-plugin-manifest",

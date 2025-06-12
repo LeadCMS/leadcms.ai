@@ -3,22 +3,21 @@ import { graphql, PageProps } from "gatsby";
 import { MDXProvider } from "@mdx-js/react";
 import { MDXRenderer } from "gatsby-plugin-mdx";
 import mdxComponents from "@/components/mdxComponents";
-import { Layout } from "@/components/layout";
+import { Layout } from "@/layout";
 
-interface ContentPageData {
-  content: {
-    id: string;
-    slug: string;
-    childMdx: {
-      body: string;
+interface MdxPageData {
+  mdx: {
+    body: string;
+    frontmatter: {
+      title: string;
     };
   };
 }
 
-export const ContentPage: React.FC<PageProps<ContentPageData>> = ({ data }) => {
-  const { content } = data;
+export const ContentPage: React.FC<PageProps<MdxPageData>> = ({ data }) => {
+  const { body, frontmatter } = data.mdx;
 
-  if (!content) {
+  if (!body) {
     return (
       <Layout>
         <main className="flex-1">
@@ -34,7 +33,7 @@ export const ContentPage: React.FC<PageProps<ContentPageData>> = ({ data }) => {
     <Layout>
       <main className="flex-1">
         <MDXProvider components={mdxComponents}>
-          <MDXRenderer>{content.childMdx.body}</MDXRenderer>
+          <MDXRenderer>{body}</MDXRenderer>
         </MDXProvider>
       </main>
     </Layout>
@@ -42,12 +41,11 @@ export const ContentPage: React.FC<PageProps<ContentPageData>> = ({ data }) => {
 };
 
 export const query = graphql`
-  query ContentPageQuery($slug: String!) {
-    content: leadCmsContent(slug: { eq: $slug }) {
-      id
-      slug
-      childMdx {
-        body
+  query MdxPage($slug: String!) {
+    mdx(slug: { eq: $slug }) {
+      body
+      frontmatter {
+        title
       }
     }
   }

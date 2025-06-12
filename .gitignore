@@ -1,6 +1,8 @@
 node_modules/
 .cache/
 public
+content
+dist
 src/gatsby-types.d.ts
 # Yarn
 .yarn/*
