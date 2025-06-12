@@ -4,18 +4,22 @@ import { MDXProvider } from "@mdx-js/react";
 import { MDXRenderer } from "gatsby-plugin-mdx";
 import mdxComponents from "@/components/mdxComponents";
 import { Layout } from "@/components/layout";
+import { Helmet } from "react-helmet";
 
 interface MdxPageData {
   mdx: {
     body: string;
     frontmatter: {
       title: string;
+      description?: string;
+      seoKeywords?: string | string[];
     };
   };
 }
 
 export const ContentPage: React.FC<PageProps<MdxPageData>> = ({ data }) => {
   const { body, frontmatter } = data.mdx;
+  const { title, description, seoKeywords } = frontmatter;
 
   if (!body) {
     return (
@@ -31,6 +35,18 @@ export const ContentPage: React.FC<PageProps<MdxPageData>> = ({ data }) => {
 
   return (
     <Layout>
+      <Helmet>
+        {title && <title>{title}</title>}
+        {description && (
+          <meta name="description" content={description} />
+        )}
+        {seoKeywords && (
+          <meta
+            name="keywords"
+            content={Array.isArray(seoKeywords) ? seoKeywords.join(", ") : seoKeywords}
+          />
+        )}
+      </Helmet>
       <main className="flex-1">
         <MDXProvider components={mdxComponents}>
           <MDXRenderer>{body}</MDXRenderer>
@@ -46,6 +62,8 @@ export const query = graphql`
       body
       frontmatter {
         title
+        description
+        seoKeywords
       }
     }
   }
