@@ -54,6 +54,14 @@ const config: GatsbyConfig = {
 
     // 4. Source LeadCMS content from filesystem
     {
+      resolve: "gatsby-source-filesystem",
+      options: {
+        name: "content",
+        path: "./content",
+      },
+      __key: "content",
+    },    
+    {
       resolve: "gatsby-plugin-page-creator",
       options: {
         path: "./content",
