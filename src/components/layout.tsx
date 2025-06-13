@@ -60,10 +60,10 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
                 </p>
               </div>
               <nav className="flex gap-6">
-                <Link to="/terms" className="text-sm font-medium text-muted-foreground hover:underline underline-offset-4">
+                <Link to="/legal/terms" className="text-sm font-medium text-muted-foreground hover:underline underline-offset-4">
                   Terms
                 </Link>
-                <Link to="/privacy" className="text-sm font-medium text-muted-foreground hover:underline underline-offset-4">
+                <Link to="/legal/privacy" className="text-sm font-medium text-muted-foreground hover:underline underline-offset-4">
                   Privacy
                 </Link>
                 <a
