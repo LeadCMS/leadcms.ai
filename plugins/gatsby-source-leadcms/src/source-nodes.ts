@@ -3,7 +3,7 @@ import fs from "fs/promises"
 import path from "path"
 import matter from "gray-matter"
 import yaml from "js-yaml"
-import type { GatsbyCache } from "gatsby"
+import type { GatsbyCache, Reporter, Actions, NodePluginArgs } from "gatsby"
 import { ContentFileHelper } from "./content-file-helper"
 import axios from "axios"
 
@@ -19,10 +19,22 @@ async function saveSyncToken(cache: GatsbyCache, syncToken: string) {
 	await cache.set("leadcms-sync-token", syncToken)
 }
 
-export const onPreInit = ({ reporter }) => reporter.info("Loaded gatsby-source-leadcms plugin")
+export const onPreInit = ({ reporter }: { reporter: Reporter }) => reporter.info("Loaded gatsby-source-leadcms plugin")
 
 export const sourceNodes = async (
-	{ reporter, cache, actions, createNodeId, createContentDigest },
+	{
+		reporter,
+		cache,
+		actions,
+		createNodeId,
+		createContentDigest,
+	}: {
+		reporter: Reporter;
+		cache: GatsbyCache;
+		actions: Actions;
+		createNodeId: NodePluginArgs["createNodeId"];
+		createContentDigest: NodePluginArgs["createContentDigest"];
+	},
 	pluginOptions: { leadCMSUrl: string; language?: string; targetDir: string },
 ) => {
 	const { leadCMSUrl, language, targetDir } = pluginOptions

@@ -4,7 +4,8 @@
   "description": "Gatsby source plugin for LeadCMS",
   "main": "index.js",
   "dependencies": {
-    "axios": "^1.8.4"
+    "axios": "^1.8.4",
+    "js-yaml": "^4.1.0"
   },
   "peerDependencies": {
     "gatsby": "^4.25.9",
@@ -12,6 +13,7 @@
     "gatsby-source-filesystem": "^4.25.0"
   },
   "devDependencies": {
+    "@types/js-yaml": "^4.0.9",
     "@types/node": "^18.0.0",
     "@types/react": "^18.0.0",
     "typescript": "5.3.3"
