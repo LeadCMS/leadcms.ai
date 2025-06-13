@@ -81,7 +81,7 @@ class LeadCMSApiClient {
 		const allDeleted: Array<number> = []
 		let token = syncToken || ""
 		let page = 0
-		let nextSyncToken: string | undefined = token
+		let nextSyncToken: string | undefined = undefined
 		// eslint-disable-next-line no-constant-condition
 		while (true) {
 			const url = new URL("/api/content/sync", this._options.leadCMSUrl)
@@ -92,12 +92,16 @@ class LeadCMSApiClient {
 			const data = await response.json()
 			if (data.items && Array.isArray(data.items)) allItems.push(...data.items)
 			if (data.deleted && Array.isArray(data.deleted)) allDeleted.push(...data.deleted)
-			nextSyncToken = response.headers.get("x-next-sync-token") || nextSyncToken
-			if (!nextSyncToken || nextSyncToken === token) break
-			token = nextSyncToken
+			const newSyncToken = response.headers.get("x-next-sync-token")
+			if (!newSyncToken || newSyncToken === token) {
+				nextSyncToken = newSyncToken || token
+				break
+			}
+			nextSyncToken = newSyncToken
+			token = newSyncToken
 			reporter.info(`gatsby-source-leadcms: Synced page ${++page}, token: ${token}`)
 		}
-		return { items: allItems, deleted: allDeleted, nextSyncToken: nextSyncToken || "" }
+		return { items: allItems, deleted: allDeleted, nextSyncToken: nextSyncToken || token }
 	}
 }
 

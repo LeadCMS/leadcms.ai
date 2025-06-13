@@ -58,6 +58,7 @@ export const sourceNodes = async (
 
 	await fs.mkdir(contentDir, { recursive: true })
 	const syncToken = await loadSyncToken(cache)
+	reporter.info(`gatsby-source-leadcms: Using sync token: ${syncToken || "(none - full sync)"}`)
 	if (!syncToken) {
 		// Remove all files and folders in contentDir if starting a full sync
 		const entries = await fs.readdir(contentDir, { withFileTypes: true })
@@ -326,6 +327,7 @@ export const sourceNodes = async (
 	// Garbage collect empty folders after sync
 	await ContentFileHelper.removeEmptyDirsRecursive(contentDir)
 
+	reporter.info(`gatsby-source-leadcms: Saving next sync token: ${nextSyncToken}`)
 	await saveSyncToken(cache, nextSyncToken)
 
 	const importedCount = contentRecords.length;
