@@ -43,7 +43,7 @@ async function fetchPaginated<T>(url: URL): Promise<Array<T>> {
 		const response = await axios.get(url.toString())
 		const totalCount = Number(response.headers["x-total-count"]) || response.data.length
 		allData.push(...response.data)
-		console.log(`Loaded ${allData.length} items of ${totalCount}`)
+		console.log(`Loaded ${allData.length} items of ${totalCount} from ${url.pathname}`)
 		if (totalCount === allData.length) {
 			break
 		}

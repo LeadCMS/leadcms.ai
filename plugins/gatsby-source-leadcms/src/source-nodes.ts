@@ -20,7 +20,7 @@ async function saveSyncToken(cache: GatsbyCache, syncToken: string) {
 export const onPreInit = ({ reporter }) => reporter.info("Loaded gatsby-source-leadcms plugin")
 
 export const sourceNodes = async (
-	{ reporter, cache },
+	{ reporter, cache, actions, createNodeId, createContentDigest },
 	pluginOptions: { leadCMSUrl: string; language?: string; targetDir: string },
 ) => {
 	const { leadCMSUrl, language, targetDir } = pluginOptions
@@ -145,5 +145,35 @@ export const sourceNodes = async (
 
 	await saveSyncToken(cache, nextSyncToken)
 
-	reporter.info(`gatsby-source-leadcms: Imported ${contentRecords.length} posts to ${targetDir}`)
+	const importedCount = contentRecords.length;
+	const deletedCount = deleted.length;
+
+	if (importedCount === 0 && deletedCount === 0) {
+		reporter.info("gatsby-source-leadcms: All content is up to date.");
+	} else {
+		if (importedCount > 0) {
+			reporter.info(`gatsby-source-leadcms: Imported ${importedCount} content record${importedCount === 1 ? "" : "s"} to ${targetDir}`);
+		}
+		if (deletedCount > 0) {
+			reporter.info(`gatsby-source-leadcms: Deleted ${deletedCount} content record${deletedCount === 1 ? "" : "s"} from ${targetDir}`);
+		}
+	}
+
+	// Create a minimal system node to avoid Gatsby warning about no nodes
+	actions.createNode({
+		id: createNodeId("leadcms-system-node"),
+		parent: null,
+		children: [],
+		internal: {
+			type: "LeadCMS",
+			contentDigest: createContentDigest({
+				importedCount,
+				deletedCount,
+				timestamp: Date.now(),
+			}),
+		},
+		importedCount,
+		deletedCount,
+		timestamp: Date.now(),
+	});
 }
