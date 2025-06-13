@@ -5,6 +5,7 @@ import matter from "gray-matter"
 import yaml from "js-yaml"
 import type { GatsbyCache } from "gatsby"
 import { ContentFileHelper } from "./content-file-helper"
+import axios from "axios"
 
 async function loadSyncToken(cache: GatsbyCache): Promise<string | undefined> {
 	try {
@@ -30,6 +31,9 @@ export const sourceNodes = async (
 		return
 	}
 
+	// Use a dedicated 'content' subdirectory for all content data
+	const contentDir = path.join(targetDir, "content")
+
 	const api = new LeadCMSApiClient({ leadCMSUrl, language })
 	reporter.info(`gatsby-source-leadcms: Fetching content types from ${leadCMSUrl}`)
 	let contentTypes: Array<IContentType> = []
@@ -40,13 +44,13 @@ export const sourceNodes = async (
 		return
 	}
 
-	await fs.mkdir(targetDir, { recursive: true })
+	await fs.mkdir(contentDir, { recursive: true })
 	const syncToken = await loadSyncToken(cache)
 	if (!syncToken) {
-		// Remove all files and folders in targetDir if starting a full sync
-		const entries = await fs.readdir(targetDir, { withFileTypes: true })
+		// Remove all files and folders in contentDir if starting a full sync
+		const entries = await fs.readdir(contentDir, { withFileTypes: true })
 		for (const entry of entries) {
-			const entryPath = path.join(targetDir, entry.name)
+			const entryPath = path.join(contentDir, entry.name)
 			if (entry.isDirectory()) {
 				await fs.rm(entryPath, { recursive: true, force: true })
 			} else {
@@ -79,7 +83,8 @@ export const sourceNodes = async (
 		}
 		const { format, supportsComments, supportsCoverImage } = contentType
 
-		const omitFields = []
+		// Explicitly type omitFields as string[]
+		const omitFields: string[] = []
 		if (!supportsComments) omitFields.push("allowComments")
 		if (!supportsCoverImage) omitFields.push("coverImageUrl", "coverImageAlt")
 
@@ -95,21 +100,76 @@ export const sourceNodes = async (
 			),
 		)
 
-		const fileBase = path.join(targetDir, contentRecord.slug)
+		const fileBase = path.join(contentDir, contentRecord.slug)
 		let filePath = fileBase
 		let fileContent = ""
 
-		// Determine extension and content
+		// --- MEDIA HANDLING FOR MDX/MD ---
+		let mediaImports: string[] = []
+		let mediaReplacements: Array<{ original: string; replacement: string }> = []
+		let processedBody = contentRecord.body
+
 		if (format === "MDX" || format === "MD") {
-			const parsed = matter(contentRecord.body)
+			// 1. Find all media URLs
+			const mediaRefs = findMediaUrls(contentRecord.body, leadCMSUrl)
+			for (const { url, localPath, importVar } of mediaRefs) {
+				const absMediaPath = path.join(targetDir, localPath)
+				try {
+					await downloadMediaFile(url, absMediaPath)
+					reporter.info(`gatsby-source-leadcms: Downloaded media ${url} -> ${absMediaPath}`)
+				} catch (e) {
+					const errorMsg = e instanceof Error ? `${e.message}\n${e.stack}` : String(e)
+					reporter.warn(`gatsby-source-leadcms: Failed to download media ${url}: ${errorMsg}`)
+					continue
+				}
+				// Correct import path: should be "../media/..."
+				mediaImports.push(`import ${importVar} from "../${localPath.replace(/\\/g, "/")}"`)
+				// Replace all occurrences of the original URL with the importVar (for markdown/JSX)
+				mediaReplacements.push({ original: url, replacement: importVar })
+				const rawPath = url.replace(/^https?:\/\/[^/]+/, "")
+				mediaReplacements.push({ original: rawPath, replacement: importVar })
+			}
+
+			// 2. Replace all media URLs in the body with the imported variable (not as a string)
+			if (mediaReplacements.length > 0) {
+				for (const { original, replacement } of mediaReplacements) {
+					const safeOriginal = original.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+					const re = new RegExp(safeOriginal, "g")
+					processedBody = processedBody.replace(re, replacement)
+				}
+			}
+
+			// 2b. Replace JSX props like image="img_index_leadcms_preview_png" with image={img_index_leadcms_preview_png}
+			if (mediaRefs.length > 0) {
+				for (const { importVar } of mediaRefs) {
+					// Replace image="img_index_leadcms_preview_png" or src="img_index_leadcms_preview_png" with image={img_index_leadcms_preview_png}
+					const jsxPropVarNameRegex = new RegExp(`(image|src)=["']${importVar}["']`, "g")
+					processedBody = processedBody.replace(jsxPropVarNameRegex, `$1={${importVar}}`)
+					// Also handle image="${img_index_leadcms_preview_png}" or src="${img_index_leadcms_preview_png}"
+					const jsVarPattern = `\\$\\{${importVar}\\}`
+					const jsxPropVarExprRegex = new RegExp(`(image|src)=["']${jsVarPattern}["']`, "g")
+					processedBody = processedBody.replace(jsxPropVarExprRegex, `$1={${importVar}}`)
+				}
+			}
+
+			// 3. Prepare MDX file content
+			const parsed = matter(processedBody)
 			const mergedFrontmatter = {
 				...parsed.data,
 				...filteredRecord,
 			}
 			const ext = format === "MDX" ? ".mdx" : ".md"
 			filePath += ext
+			let importBlock = ""
+			if (mediaImports.length > 0) {
+				importBlock = mediaImports.join("\n") + "\n"
+			}
+			// --- Insert an empty line after imports and before MDX content ---
 			fileContent =
-				`---\n${yaml.dump(mergedFrontmatter)}---\n` + parsed.content.replace(/^\s+/, "")
+				`---\n${yaml.dump(mergedFrontmatter)}---\n` +
+				(importBlock ? importBlock : "") +
+				(importBlock ? "\n" : "") + // always add an empty line after imports if imports exist
+				parsed.content.replace(/^\s+/, "")
 		} else if (format === "YAML") {
 			filePath += ".yml"
 			const yamlObj = { ...filteredRecord, body: contentRecord.body }
@@ -141,7 +201,7 @@ export const sourceNodes = async (
 	}
 
 	// --- Remove obsolete files for records whose slug has changed ---
-	const allFiles = await ContentFileHelper.listFilesRecursive(targetDir)
+	const allFiles = await ContentFileHelper.listFilesRecursive(contentDir)
 	for (const filePath of allFiles) {
 		// Ignore directories and meta.json files for now (meta.json handled with main file)
 		if (filePath.endsWith(".meta.json")) continue
@@ -157,7 +217,7 @@ export const sourceNodes = async (
 		if (!expectedSlug) continue // deleted content, handled below
 
 		// Compute expected file path for this id/slug
-		let expectedBase = path.join(targetDir, expectedSlug)
+		let expectedBase = path.join(contentDir, expectedSlug)
 		let expectedPaths = [
 			expectedBase + ".mdx",
 			expectedBase + ".md",
@@ -179,10 +239,10 @@ export const sourceNodes = async (
 
 	// Handle deleted content
 	for (const id of deleted) {
-		const files = await fs.readdir(targetDir)
+		const files = await fs.readdir(contentDir)
 		for (const file of files) {
 			if (file.endsWith(".meta.json")) continue
-			const filePath = path.join(targetDir, file)
+			const filePath = path.join(contentDir, file)
 			try {
 				const content = await fs.readFile(filePath, "utf8")
 				if (content.includes(`id: ${id}`) || content.includes(`"id": ${id}`)) {
@@ -202,7 +262,7 @@ export const sourceNodes = async (
 	}
 
 	// Garbage collect empty folders after sync
-	await ContentFileHelper.removeEmptyDirsRecursive(targetDir)
+	await ContentFileHelper.removeEmptyDirsRecursive(contentDir)
 
 	await saveSyncToken(cache, nextSyncToken)
 
@@ -213,10 +273,10 @@ export const sourceNodes = async (
 		reporter.info("gatsby-source-leadcms: All content is up to date.");
 	} else {
 		if (importedCount > 0) {
-			reporter.info(`gatsby-source-leadcms: Imported ${importedCount} content record${importedCount === 1 ? "" : "s"} to ${targetDir}`);
+			reporter.info(`gatsby-source-leadcms: Imported ${importedCount} content record${importedCount === 1 ? "" : "s"} to ${contentDir}`);
 		}
 		if (deletedCount > 0) {
-			reporter.info(`gatsby-source-leadcms: Deleted ${deletedCount} content record${deletedCount === 1 ? "" : "s"} from ${targetDir}`);
+			reporter.info(`gatsby-source-leadcms: Deleted ${deletedCount} content record${deletedCount === 1 ? "" : "s"} from ${contentDir}`);
 		}
 	}
 
@@ -237,4 +297,61 @@ export const sourceNodes = async (
 		deletedCount,
 		timestamp: Date.now(),
 	});
+}
+
+// Utility to find all media URLs in a string (markdown, JSX, or component props)
+function findMediaUrls(mdx: string, leadCMSUrl: string): Array<{ url: string; localPath: string; importVar: string }> {
+	const results: Array<{ url: string; localPath: string; importVar: string }> = []
+	const seen = new Set<string>()
+	const mediaRegexes = [
+		// Markdown image: ![alt](/api/media/...)
+		/!\[[^\]]*\]\((\/api\/media\/[^\s)]+)\)/g,
+		// Markdown image: ![alt](https://admin.leadcms.ai/api/media/...)
+		/!\[[^\]]*\]\((https?:\/\/[^)]+\/api\/media\/[^\s)]+)\)/g,
+		// JSX/HTML <img src="/api/media/...">
+		/<img[^>]*src=["'](\/api\/media\/[^"']+)["']/g,
+		/<img[^>]*src=["'](https?:\/\/[^"']+\/api\/media\/[^"']+)["']/g,
+		// JSX <Image src="/api/media/...">
+		/<Image[^>]*src=["'](\/api\/media\/[^"']+)["']/g,
+		/<Image[^>]*src=["'](https?:\/\/[^"']+\/api\/media\/[^"']+)["']/g,
+		// --- NEW: Any JSX prop named image or src with /api/media/... or full URL ---
+		/\b(?:image|src)=["'](\/api\/media\/[^"']+)["']/g,
+		/\b(?:image|src)=["'](https?:\/\/[^"']+\/api\/media\/[^"']+)["']/g,
+	]
+	for (const regex of mediaRegexes) {
+		let match
+		while ((match = regex.exec(mdx))) {
+			const rawUrl = match[1]
+			if (seen.has(rawUrl)) continue
+			seen.add(rawUrl)
+			// Normalize to absolute URL
+			let url: string
+			if (rawUrl.startsWith("http")) {
+				url = rawUrl
+			} else {
+				url = leadCMSUrl.replace(/\/$/, "") + rawUrl
+			}
+			// Extract path after /media/
+			const mediaPathMatch = /\/media\/(.+)$/.exec(rawUrl)
+			if (!mediaPathMatch) continue
+			const mediaPath = mediaPathMatch[1]
+			const localPath = `media/${mediaPath}`
+			// Variable name: imgIndex_leadcms_preview_png
+			const importVar = "img_" + mediaPath.replace(/[^a-zA-Z0-9]/g, "_")
+			results.push({ url, localPath, importVar })
+		}
+	}
+	return results
+}
+
+// Download a file to disk if not already present
+async function downloadMediaFile(url: string, destPath: string) {
+	await fs.mkdir(path.dirname(destPath), { recursive: true })
+	try {
+		await fs.access(destPath)
+		// Already exists
+		return
+	} catch {}
+	const response = await axios.get(url, { responseType: "arraybuffer" })
+	await fs.writeFile(destPath, response.data)
 }

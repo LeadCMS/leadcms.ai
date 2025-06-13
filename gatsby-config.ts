@@ -48,7 +48,7 @@ const config: GatsbyConfig = {
       options: {
         leadCMSUrl: apiUrl,
         language: process.env.GATSBY_LEADCMS_LANGUAGE || "en",
-        targetDir: "./content",
+        targetDir: "./.leadcms",
       },
     },
 
@@ -57,14 +57,14 @@ const config: GatsbyConfig = {
       resolve: "gatsby-source-filesystem",
       options: {
         name: "content",
-        path: "./content",
+        path: "./.leadcms/content/",
       },
       __key: "content",
     },    
     {
       resolve: "gatsby-plugin-page-creator",
       options: {
-        path: "./content",
+        path: "./.leadcms/content/",
       },
     },
 

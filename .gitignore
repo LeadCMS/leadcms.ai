@@ -2,6 +2,7 @@ node_modules/
 .cache/
 public
 content
+.leadcms
 dist
 src/gatsby-types.d.ts
 # Yarn
