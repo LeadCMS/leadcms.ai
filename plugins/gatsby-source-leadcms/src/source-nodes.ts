@@ -122,24 +122,74 @@ export const sourceNodes = async (
 		let processedBody = contentRecord.body
 
 		if (format === "MDX" || format === "MD") {
-			// 1. Find all media URLs
+			// 1. Find all media URLs in body content
 			const mediaRefs = findMediaUrls(contentRecord.body, leadCMSUrl)
-			for (const { url, localPath, importVar } of mediaRefs) {
+			
+			// 2. Find media URLs in frontmatter fields BEFORE converting them
+			const frontmatterMediaRefs = findMediaUrlsInFrontmatter(filteredRecord, leadCMSUrl)
+			
+			// 3. Combine all media references and deduplicate by URL
+			const allMediaRefsMap = new Map<string, { url: string; localPath: string; importVar: string }>()
+			for (const ref of [...mediaRefs, ...frontmatterMediaRefs]) {
+				allMediaRefsMap.set(ref.url, ref)
+			}
+			const allMediaRefs = Array.from(allMediaRefsMap.values())
+			
+			// 4. Download all media files
+			for (const { url, localPath, importVar } of allMediaRefs) {
 				const absMediaPath = path.join(targetDir, localPath)
+				const publicMediaPath = path.join(process.cwd(), "public", localPath)
 				try {
 					await downloadMediaFile(url, absMediaPath)
-					reporter.info(`gatsby-source-leadcms: Downloaded media ${url} -> ${absMediaPath}`)
+					// Also copy to public directory for static serving
+					await downloadMediaFile(url, publicMediaPath)
+					reporter.info(`gatsby-source-leadcms: Downloaded media ${url} -> ${absMediaPath} and ${publicMediaPath}`)
 				} catch (e) {
 					const errorMsg = e instanceof Error ? `${e.message}\n${e.stack}` : String(e)
 					reporter.warn(`gatsby-source-leadcms: Failed to download media ${url}: ${errorMsg}`)
 					continue
 				}
-				// Correct import path: should be "../media/..."
-				mediaImports.push(`import ${importVar} from "../${localPath.replace(/\\/g, "/")}"`)
-				// Replace all occurrences of the original URL with the importVar (for markdown/JSX)
-				mediaReplacements.push({ original: url, replacement: importVar })
-				const rawPath = url.replace(/^https?:\/\/[^/]+/, "")
-				mediaReplacements.push({ original: rawPath, replacement: importVar })
+				// Calculate relative path from MDX file to media file (only for body content media that needs imports)
+				if (mediaRefs.some(ref => ref.url === url)) {
+					const mdxDir = path.dirname(fileBase)
+					const relImportPath = path.relative(mdxDir, path.join(targetDir, localPath)).replace(/\\/g, "/")
+					mediaImports.push(`import ${importVar} from "${relImportPath}"`)
+					// Replace all occurrences of the original URL with the importVar (for markdown/JSX)
+					mediaReplacements.push({ original: url, replacement: importVar })
+					const rawPath = url.replace(/^https?:\/\/[^/]+/, "")
+					mediaReplacements.push({ original: rawPath, replacement: importVar })
+				}
+			}
+
+			// 5. Replace /api/media/ URLs in frontmatter fields with /media/ URLs
+			for (const [key, value] of Object.entries(filteredRecord)) {
+				if (typeof value === "string" && value.includes("/api/media/")) {
+					filteredRecord[key] = value.replace(/\/api\/media\//g, "/media/")
+					reporter.info(`gatsby-source-leadcms: Converted frontmatter URL in ${key}: ${value} -> ${filteredRecord[key]}`)
+				}
+			}
+
+			// Replace markdown image syntax ![alt](original_url) with <img src={importVar} alt="alt" />
+			if (mediaRefs.length > 0) {
+				for (const { url, importVar } of mediaRefs) {
+					// Replace ![alt](url) and ![alt](rawPath) with <img src={importVar} alt="alt" />
+					const safeUrl = url.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+					const urlImgRegex = new RegExp(`!\\[([^\\]]*)\\]\\(${safeUrl}\\)`, "g")
+					processedBody = processedBody.replace(urlImgRegex, (_m, alt) => `<img src={${importVar}} alt="${alt}" />`)
+					const rawPath = url.replace(/^https?:\/\/[^/]+/, "")
+					const safeRawPath = rawPath.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+					const rawImgRegex = new RegExp(`!\\[([^\\]]*)\\]\\(${safeRawPath}\\)`, "g")
+					processedBody = processedBody.replace(rawImgRegex, (_m, alt) => `<img src={${importVar}} alt="${alt}" />`)
+				}
+				// Also: Replace ![alt](img_var) and ![alt](${img_var}) with <img src={img_var} alt="alt" />
+				processedBody = processedBody.replace(
+					/!\[([^\]]*)\]\((img_[a-zA-Z0-9_]+)\)/g,
+					(_match, alt, varName) => `<img src={${varName}} alt="${alt}" />`
+				)
+				processedBody = processedBody.replace(
+					/!\[([^\]]*)\]\(\$\{(img_[a-zA-Z0-9_]+)\}\)/g,
+					(_match, alt, varName) => `<img src={${varName}} alt="${alt}" />`
+				)
 			}
 
 			// 2. Replace all media URLs in the body with the imported variable (not as a string)
@@ -353,6 +403,41 @@ function findMediaUrls(mdx: string, leadCMSUrl: string): Array<{ url: string; lo
 			results.push({ url, localPath, importVar })
 		}
 	}
+	return results
+}
+
+// Utility to find media URLs in frontmatter fields
+function findMediaUrlsInFrontmatter(frontmatter: Record<string, any>, leadCMSUrl: string): Array<{ url: string; localPath: string; importVar: string }> {
+	const results: Array<{ url: string; localPath: string; importVar: string }> = []
+	const seen = new Set<string>()
+	
+	// Check all string values in frontmatter for media URLs
+	for (const [key, value] of Object.entries(frontmatter)) {
+		if (typeof value === "string" && value.includes("/api/media/")) {
+			if (seen.has(value)) continue
+			seen.add(value)
+			
+			// Normalize to absolute URL for downloading
+			let url: string
+			if (value.startsWith("http")) {
+				url = value
+			} else {
+				url = leadCMSUrl.replace(/\/$/, "") + value
+			}
+			
+			// Extract path after /api/media/
+			const mediaPathMatch = /\/api\/media\/(.+)$/.exec(value)
+			if (!mediaPathMatch) continue
+			
+			const mediaPath = mediaPathMatch[1]
+			const localPath = `media/${mediaPath}`
+			// Variable name: img_blog_test_blog_post_leadcms_preview_png
+			const importVar = "img_" + mediaPath.replace(/[^a-zA-Z0-9]/g, "_")
+			
+			results.push({ url, localPath, importVar })
+		}
+	}
+	
 	return results
 }
 

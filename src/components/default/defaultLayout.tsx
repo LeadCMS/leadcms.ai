@@ -4,8 +4,17 @@ import { MDXRenderer } from "gatsby-plugin-mdx";
 import mdxComponents from "@/components/mdxComponents";
 import { Layout } from "@/components/layout";
 
-export const DefaultLayout = ({ children }: { children: string }) => {
+export interface DefaultLayoutProps {
+  children: string;
+  frontmatter?: {
+    [key: string]: any;
+  };
+}
 
+export const DefaultLayout: React.FC<DefaultLayoutProps> = ({ 
+  children, 
+  frontmatter 
+}) => {
   return (
     <Layout>
       <main className="flex-1">

@@ -27,8 +27,17 @@ const allComponents = {
   ContactFormSection
 };
 
-export const LandingLayout = ({ children }: { children: string }) => {
+export interface LandingLayoutProps {
+  children: string;
+  frontmatter?: {
+    [key: string]: any;
+  };
+}
 
+export const LandingLayout: React.FC<LandingLayoutProps> = ({ 
+  children, 
+  frontmatter 
+}) => {
   return (
     <Layout>
       <main className="flex-1">

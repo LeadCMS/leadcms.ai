@@ -4,6 +4,7 @@ import { Layout } from "@/components/layout";
 import { Helmet } from "react-helmet";
 import { DefaultLayout } from "@/components/default/defaultLayout";
 import { LandingLayout } from "@/components/landing/landingLayout";
+import { BlogPostLayout } from "@/components/blog/blogPostLayout";
 
 interface MdxPageData {
   mdx: {
@@ -13,6 +14,12 @@ interface MdxPageData {
       description?: string;
       seoKeywords?: string | string[];
       type: string;
+      tags?: string[];
+      author?: string;
+      publishedAt?: string;
+      coverImageUrl?: string;
+      coverImageAlt?: string;
+      [key: string]: any;
     };
   };
 }
@@ -33,9 +40,13 @@ export const ContentPage: React.FC<PageProps<MdxPageData>> = ({ data }) => {
     );
   }
 
-  // Use LandingLayout for type "home" or "landing", otherwise DefaultLayout
+  // Use LandingLayout for type "home" or "landing", BlogPostLayout for "blog-post", otherwise DefaultLayout
   const LayoutComponent =
-    type === "home" || type === "landing" ? LandingLayout : DefaultLayout;
+    type === "home" || type === "landing"
+      ? LandingLayout
+      : type === "blog-post"
+      ? BlogPostLayout
+      : DefaultLayout;
 
   return (
     <>
@@ -51,7 +62,11 @@ export const ContentPage: React.FC<PageProps<MdxPageData>> = ({ data }) => {
           />
         )}
       </Helmet>
-      <LayoutComponent>{body}</LayoutComponent>
+      <LayoutComponent
+        frontmatter={frontmatter}
+      >
+        {body}
+      </LayoutComponent>
     </>
   );
 };
@@ -65,6 +80,11 @@ export const query = graphql`
         description
         seoKeywords
         type
+        tags
+        author
+        publishedAt(formatString: "YYYY-MM-DD")
+        coverImageUrl
+        coverImageAlt
       }
     }
   }
