@@ -96,7 +96,12 @@ const config: GatsbyConfig = {
     // "gatsby-transformer-yaml",
 
     // 8. Sitemap, Manifest, and other site-level plugins
-    "gatsby-plugin-sitemap",
+    {
+      resolve: "gatsby-plugin-sitemap",
+      options: {
+        output: "/",
+      },
+    },
     {
       resolve: "gatsby-plugin-manifest",
       options: {
