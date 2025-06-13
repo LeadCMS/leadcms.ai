@@ -29,6 +29,7 @@ const allComponents = {
 
 export interface LandingLayoutProps {
   children: string;
+  timeToRead?: number;
   frontmatter?: {
     [key: string]: any;
   };
@@ -36,6 +37,7 @@ export interface LandingLayoutProps {
 
 export const LandingLayout: React.FC<LandingLayoutProps> = ({ 
   children, 
+  timeToRead,
   frontmatter 
 }) => {
   return (

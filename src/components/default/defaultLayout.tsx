@@ -6,6 +6,7 @@ import { Layout } from "@/components/layout";
 
 export interface DefaultLayoutProps {
   children: string;
+  timeToRead?: number;
   frontmatter?: {
     [key: string]: any;
   };
@@ -13,6 +14,7 @@ export interface DefaultLayoutProps {
 
 export const DefaultLayout: React.FC<DefaultLayoutProps> = ({ 
   children, 
+  timeToRead,
   frontmatter 
 }) => {
   return (

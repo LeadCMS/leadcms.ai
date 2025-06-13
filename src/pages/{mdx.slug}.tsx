@@ -9,6 +9,7 @@ import { BlogPostLayout } from "@/components/blog/blogPostLayout";
 interface MdxPageData {
   mdx: {
     body: string;
+    timeToRead: number;
     frontmatter: {
       title: string;
       description?: string;
@@ -25,7 +26,7 @@ interface MdxPageData {
 }
 
 export const ContentPage: React.FC<PageProps<MdxPageData>> = ({ data }) => {
-  const { body, frontmatter } = data.mdx;
+  const { body, timeToRead, frontmatter } = data.mdx;
   const { title, description, seoKeywords, type } = frontmatter;
 
   if (!body) {
@@ -64,6 +65,7 @@ export const ContentPage: React.FC<PageProps<MdxPageData>> = ({ data }) => {
       </Helmet>
       <LayoutComponent
         frontmatter={frontmatter}
+        timeToRead={timeToRead}
       >
         {body}
       </LayoutComponent>
@@ -75,6 +77,7 @@ export const query = graphql`
   query MdxPage($slug: String!) {
     mdx(slug: { eq: $slug }) {
       body
+      timeToRead
       frontmatter {
         title
         description

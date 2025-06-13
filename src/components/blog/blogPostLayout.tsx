@@ -7,6 +7,7 @@ import { TableOfContents } from "./tableOfContents";
 
 export interface BlogPostLayoutProps {
   children: string;
+  timeToRead?: number;
   frontmatter: {
     title?: string;
     description?: string;
@@ -21,6 +22,7 @@ export interface BlogPostLayoutProps {
 
 export const BlogPostLayout: React.FC<BlogPostLayoutProps> = ({
   children,
+  timeToRead,
   frontmatter,
 }) => {
   const { title, description, tags, author, publishedAt, coverImageUrl, coverImageAlt } = frontmatter;
@@ -49,6 +51,7 @@ export const BlogPostLayout: React.FC<BlogPostLayoutProps> = ({
               <div className="flex items-center gap-4 text-sm text-muted-foreground mt-2">
                 {author && <span>By <span className="font-semibold text-foreground">{author}</span></span>}
                 {publishedAt && <span className="opacity-70">{publishedAt}</span>}
+                {timeToRead && <span className="opacity-70">{timeToRead} min read</span>}
               </div>
             </div>
             
