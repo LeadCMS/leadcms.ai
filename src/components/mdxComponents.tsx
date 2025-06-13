@@ -17,7 +17,7 @@ import {
 } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import * as LucideIcons from "lucide-react";
-import { ContactUs } from "@/components/contact-us";
+import { ContactUs } from "@/components/contactUs";
 import { MDXProviderComponents } from '@mdx-js/react';
 
 // UI components and icons for MDX use
@@ -44,6 +44,8 @@ type AnchorProps = ComponentPropsWithoutRef<'a'>;
 type ListProps = ComponentPropsWithoutRef<'ul'>;
 type ListItemProps = ComponentPropsWithoutRef<'li'>;
 type BlockquoteProps = ComponentPropsWithoutRef<'blockquote'>;
+type CodeProps = ComponentPropsWithoutRef<'code'>;
+type PreProps = ComponentPropsWithoutRef<'pre'>;
 type ImageProps = ComponentPropsWithoutRef<'img'>;
 type TableProps = ComponentPropsWithoutRef<'table'>;
 type TableCellProps = ComponentPropsWithoutRef<'td'>;

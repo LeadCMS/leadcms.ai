@@ -28,6 +28,7 @@
         "./postcss.config.ts",
         "./tailwind.config.ts",
         "./plugins/**/*.ts",
-        "./plugins/**/*.tsx"
-, "original-design.tsx"    ]
+        "./plugins/**/*.tsx",
+        "original-design.tsx"
+    ]
 }

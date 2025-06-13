@@ -32,15 +32,15 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
               </Link>
             </nav>
             <div className="flex items-center gap-4">
-              <Link
-                to="https://github.com/LeadCMS"
+              <a
+                href="https://github.com/LeadCMS"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="hidden md:flex items-center gap-2 text-sm font-medium"
               >
                 <GitBranch className="h-4 w-4" />
                 GitHub
-              </Link>
+              </a>
               <Button asChild>
                 <Link to="#contact">Get Started</Link>
               </Button>
@@ -66,22 +66,22 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
                 <Link to="/privacy" className="text-sm font-medium text-muted-foreground hover:underline underline-offset-4">
                   Privacy
                 </Link>
-                <Link 
-                  to="https://github.com/LeadCMS/leadcms.core" 
+                <a
+                  href="https://github.com/LeadCMS/leadcms.core"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-sm font-medium text-muted-foreground hover:underline underline-offset-4"
                 >
                   Docs
-                </Link>
-                <Link
-                  to="https://github.com/LeadCMS"
+                </a>
+                <a
+                  href="https://github.com/LeadCMS"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-sm font-medium text-muted-foreground hover:underline underline-offset-4"
                 >
                   GitHub
-                </Link>
+                </a>
               </nav>
             </div>
           </div>

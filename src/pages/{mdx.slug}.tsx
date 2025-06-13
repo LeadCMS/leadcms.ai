@@ -1,10 +1,9 @@
 import * as React from "react";
 import { graphql, PageProps } from "gatsby";
-import { MDXProvider } from "@mdx-js/react";
-import { MDXRenderer } from "gatsby-plugin-mdx";
-import mdxComponents from "@/components/mdxComponents";
 import { Layout } from "@/components/layout";
 import { Helmet } from "react-helmet";
+import { DefaultLayout } from "@/components/default/defaultLayout";
+import { LandingLayout } from "@/components/landing/landingLayout";
 
 interface MdxPageData {
   mdx: {
@@ -13,13 +12,14 @@ interface MdxPageData {
       title: string;
       description?: string;
       seoKeywords?: string | string[];
+      type: string;
     };
   };
 }
 
 export const ContentPage: React.FC<PageProps<MdxPageData>> = ({ data }) => {
   const { body, frontmatter } = data.mdx;
-  const { title, description, seoKeywords } = frontmatter;
+  const { title, description, seoKeywords, type } = frontmatter;
 
   if (!body) {
     return (
@@ -33,8 +33,12 @@ export const ContentPage: React.FC<PageProps<MdxPageData>> = ({ data }) => {
     );
   }
 
+  // Use LandingLayout for type "home" or "landing", otherwise DefaultLayout
+  const LayoutComponent =
+    type === "home" || type === "landing" ? LandingLayout : DefaultLayout;
+
   return (
-    <Layout>
+    <>
       <Helmet>
         {title && <title>{title}</title>}
         {description && (
@@ -47,12 +51,8 @@ export const ContentPage: React.FC<PageProps<MdxPageData>> = ({ data }) => {
           />
         )}
       </Helmet>
-      <main className="flex-1">
-        <MDXProvider components={mdxComponents}>
-          <MDXRenderer>{body}</MDXRenderer>
-        </MDXProvider>
-      </main>
-    </Layout>
+      <LayoutComponent>{body}</LayoutComponent>
+    </>
   );
 };
 
@@ -64,6 +64,7 @@ export const query = graphql`
         title
         description
         seoKeywords
+        type
       }
     }
   }

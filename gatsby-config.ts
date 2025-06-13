@@ -93,6 +93,7 @@ const config: GatsbyConfig = {
 
     // 7. MDX plugin – transforms any nodes with mediaType "text/markdown" or "text/mdx"
     "gatsby-plugin-mdx",
+    // "gatsby-transformer-yaml",
 
     // 8. Sitemap, Manifest, and other site-level plugins
     "gatsby-plugin-sitemap",
