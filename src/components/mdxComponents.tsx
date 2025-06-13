@@ -62,7 +62,7 @@ type SpanProps = ComponentPropsWithoutRef<'span'>;
 const baseComponents = {
   h1: ({ children, ...props }: HeadingProps) => (
     <h1
-      className="scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl mt-12 mb-6 text-primary"
+      className="scroll-m-20 text-4xl font-extrabold tracking-tight mt-10 mb-6 text-primary break-words hyphens-auto"
       {...props}
     >
       {children}
@@ -70,7 +70,7 @@ const baseComponents = {
   ),
   h2: ({ children, ...props }: HeadingProps) => (
     <h2
-      className="scroll-m-20 border-b pb-2 text-3xl font-semibold tracking-tight first:mt-0 mt-10 mb-5 text-primary"
+      className="scroll-m-20 border-b pb-2 text-3xl font-semibold tracking-tight first:mt-0 mt-8 mb-5 text-primary break-words hyphens-auto"
       {...props}
     >
       {children}
@@ -78,7 +78,7 @@ const baseComponents = {
   ),
   h3: ({ children, ...props }: HeadingProps) => (
     <h3
-      className="scroll-m-20 text-2xl font-semibold tracking-tight mt-8 mb-4 text-primary"
+      className="scroll-m-20 text-2xl font-semibold tracking-tight mt-6 mb-4 text-primary break-words hyphens-auto"
       {...props}
     >
       {children}
@@ -86,20 +86,20 @@ const baseComponents = {
   ),
   h4: ({ children, ...props }: HeadingProps) => (
     <h4
-      className="scroll-m-20 text-xl font-semibold tracking-tight mt-7 mb-3 text-primary"
+      className="scroll-m-20 text-xl font-semibold tracking-tight mt-5 mb-3 text-primary break-words hyphens-auto"
       {...props}
     >
       {children}
     </h4>
   ),
   p: ({ children, ...props }: ParagraphProps) => (
-    <p className="leading-7 [&:not(:first-child)]:mt-6 text-base text-foreground mb-4" {...props}>
+    <p className="leading-7 [&:not(:first-child)]:mt-6 text-base text-foreground mb-4 break-words hyphens-auto text-justify" {...props}>
       {children}
     </p>
   ),
   a: ({ children, ...props }: AnchorProps) => (
     <a
-      className="font-medium text-primary underline underline-offset-4 hover:text-primary/80 transition-colors"
+      className="font-medium text-primary underline underline-offset-4 hover:text-primary/80 transition-colors break-all"
       {...props}
     >
       {children}
@@ -112,35 +112,37 @@ const baseComponents = {
     <ol className="my-8 ml-7 list-decimal space-y-3 text-foreground" {...props} />
   ),
   li: (props: ListItemProps) => (
-    <li className="mt-3 text-base leading-relaxed" {...props} />
+    <li className="mt-3 text-base leading-relaxed break-words hyphens-auto text-justify" {...props} />
   ),
   blockquote: ({ children, ...props }: BlockquoteProps) => (
     <blockquote
-      className="mt-8 border-l-4 border-primary pl-7 italic text-muted-foreground bg-muted/40 py-4 rounded-md mb-8"
+      className="mt-8 border-l-4 border-primary pl-7 italic text-muted-foreground bg-muted/40 py-4 rounded-md mb-8 break-words hyphens-auto text-justify"
       {...props}
     >
       {children}
     </blockquote>
   ),
   pre: (props: PreProps) => (
-    <pre className="rounded-lg bg-black text-green-400 p-6 overflow-x-auto my-8 text-sm" {...props} />
+    <pre className="rounded-lg bg-black text-green-400 p-6 overflow-x-auto my-8 text-sm whitespace-pre-wrap break-words max-w-full" {...props} />
   ),
   code: (props: CodeProps) => (
-    <code className="relative rounded bg-muted px-[0.4em] py-[0.3em] font-mono text-base text-primary" {...props} />
+    <code className="relative rounded bg-muted px-[0.4em] py-[0.3em] font-mono text-base text-primary break-all whitespace-pre-wrap max-w-full inline-block" {...props} />
   ),
   img: (props: ImageProps) => (
-    <img className="rounded-lg border shadow-md my-8 mx-auto max-w-full" {...props} alt={props.alt || ''} />
+    <img className="rounded-lg border shadow-md my-8 mx-auto max-w-full w-full h-auto object-contain" {...props} alt={props.alt || ''} />
   ),
   table: (props: TableProps) => (
-    <div className="w-full overflow-x-auto my-8">
-      <table className="w-full text-left border-collapse" {...props} />
+    <div className="w-full overflow-x-auto my-8 -mx-4 sm:mx-0">
+      <div className="min-w-full px-4 sm:px-0">
+        <table className="w-full text-left border-collapse text-base" {...props} />
+      </div>
     </div>
   ),
   th: (props: TableHeadProps) => (
-    <th className="border-b px-5 py-3 font-semibold bg-muted text-foreground" {...props} />
+    <th className="border-b px-5 py-3 font-semibold bg-muted text-foreground text-sm break-words" {...props} />
   ),
   td: (props: TableCellProps) => (
-    <td className="border-b px-5 py-3" {...props} />
+    <td className="border-b px-5 py-3 text-sm break-words" {...props} />
   ),
   hr: () => <hr className="my-12 border-muted" />, 
   div: (props: DivProps) => <div {...props} />, 

@@ -129,14 +129,14 @@ export function ContactUs() {
   };
 
   return (
-    <Card>
+    <Card className="w-full max-w-full">
       <CardHeader>
         <CardTitle>Contact Us</CardTitle>
         <CardDescription>
           Fill out the form below and we'll get back to you as soon as possible.
         </CardDescription>
       </CardHeader>
-      <CardContent>
+      <CardContent className="w-full">
         {formState.isSuccess ? (
           <div className="flex flex-col items-center justify-center space-y-3 text-center p-6">
             <CheckCircle className="h-12 w-12 text-green-500" />
@@ -155,7 +155,7 @@ export function ContactUs() {
             </Button>
           </div>
         ) : (
-          <form className="grid gap-4" onSubmit={handleSubmit}>
+          <form className="grid gap-4 w-full" onSubmit={handleSubmit}>
             {formState.isError && (
               <div className="bg-destructive/10 p-3 rounded-md flex items-start gap-2 text-destructive">
                 <AlertCircle className="h-5 w-5 shrink-0 mt-0.5" />
@@ -166,7 +166,7 @@ export function ContactUs() {
               </div>
             )}
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <label
                   htmlFor="first-name"

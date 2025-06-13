@@ -127,6 +127,7 @@ const config: Config = {
         'text-sm', 'text-base', 'text-lg', 'text-xl', 'text-2xl', 'text-3xl', 'text-4xl',
         'font-normal', 'font-medium', 'font-semibold', 'font-bold',
         'text-primary', 'text-secondary', 'text-muted-foreground', 'text-primary-foreground',
+        'text-justify',
         
         // New color classes to safelist
         'text-primary400', 'text-secondary500', 'text-tertiary100', 'text-success500', 'text-error500',
