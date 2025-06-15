@@ -21,7 +21,8 @@
     },
     "include": [
         "./src/**/*",
-        "./gatsby-browser.ts",
+        "./gatsby-browser.tsx",
+        "./gatsby-ssr.tsx",
         "./gatsby-config.ts",
         "./gatsby-node.ts",
         "./gatsby-ssr.ts",

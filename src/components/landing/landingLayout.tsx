@@ -1,6 +1,5 @@
 import React from "react";
 import { MDXProvider } from "@mdx-js/react";
-import { MDXRenderer } from "gatsby-plugin-mdx";
 import mdxComponents from "@/components/mdxComponents";
 import { Layout } from "@/components/layout";
 
@@ -28,8 +27,8 @@ const allComponents = {
 };
 
 export interface LandingLayoutProps {
-  children: string;
-  timeToRead?: number;
+  children: React.ReactNode;
+  timeToRead?: string;
   frontmatter?: {
     [key: string]: any;
   };
@@ -43,9 +42,7 @@ export const LandingLayout: React.FC<LandingLayoutProps> = ({
   return (
     <Layout>
       <main className="flex-1">
-        <MDXProvider components={allComponents}>
-          <MDXRenderer>{children}</MDXRenderer>
-        </MDXProvider>
+        <MDXProvider components={allComponents}>{children}</MDXProvider>
       </main>
     </Layout>
   );

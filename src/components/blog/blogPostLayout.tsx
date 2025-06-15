@@ -1,13 +1,12 @@
 import React from "react";
 import { MDXProvider } from "@mdx-js/react";
-import { MDXRenderer } from "gatsby-plugin-mdx";
 import mdxComponents from "@/components/mdxComponents";
 import { Layout } from "@/components/layout";
 import { TableOfContents } from "./tableOfContents";
 
 export interface BlogPostLayoutProps {
-  children: string;
-  timeToRead?: number;
+  children: React.ReactNode;
+  timeToRead?: string;
   frontmatter: {
     title?: string;
     description?: string;
@@ -51,7 +50,7 @@ export const BlogPostLayout: React.FC<BlogPostLayoutProps> = ({
               <div className="flex items-center gap-4 text-sm text-muted-foreground mt-2">
                 {author && <span>By <span className="font-semibold text-foreground">{author}</span></span>}
                 {publishedAt && <span className="opacity-70">{publishedAt}</span>}
-                {timeToRead && <span className="opacity-70">{timeToRead} min read</span>}
+                {timeToRead && <span className="opacity-70">{timeToRead}</span>}
               </div>
             </div>
             
@@ -79,9 +78,7 @@ export const BlogPostLayout: React.FC<BlogPostLayoutProps> = ({
             {/* Main Content */}
             <div className="lg:col-span-3 w-full min-w-0">
               <article className="prose prose-lg dark:prose-invert max-w-none prose-headings:break-words prose-p:break-words prose-li:break-words w-full min-w-0 mobile-safe [&>*]:max-w-full [&>*]:break-words [&_pre]:overflow-x-auto [&_pre]:max-w-full [&_code]:break-all [&_code]:max-w-full [&_a]:break-all px-4 sm:px-0">
-                <MDXProvider components={mdxComponents}>
-                  <MDXRenderer>{children}</MDXRenderer>
-                </MDXProvider>
+                <MDXProvider components={mdxComponents}>{children}</MDXProvider>
               </article>
             </div>
             
